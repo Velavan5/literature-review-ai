@@ -1,19 +1,11 @@
 # Literature Review AI - Hackathon Project
 
-Backend service for the AI-powered literature review tool.
-
-## Features (Step 1)
-
-* Flask backend server.
-* `/search` POST endpoint that accepts a JSON payload `{"query": "your search terms", "limit": 10}`.
-* Queries the Semantic Scholar API based on the provided query.
-* Returns a JSON list of relevant papers with fields like `paperId`, `url`, `title`, `abstract`, `authors`, `year`.
 
 ## Setup
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repo-url>
+    git clone https://github.com/Velavan5/literature-review-ai.git
     cd literature-review-ai
     ```
 
@@ -38,8 +30,7 @@ Backend service for the AI-powered literature review tool.
     ```bash
     python app.py
     ```
-    The server will start, usually at `http://127.0.0.1:5000/` or `http://0.0.0.0:5000/`.
-
+    The server will start, usually at `http://127.0.0.1:5000/` .
 ## Usage
 
 Send a POST request to the `/search` endpoint with a JSON body:
