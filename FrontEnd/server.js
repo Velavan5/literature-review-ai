@@ -130,6 +130,6 @@ app.listen(PORT, () => {
   console.log(
     `[${new Date().toISOString()}] Express server started successfully.`
   );
-  console.log(`Frontend accessible at http://localhost:${PORT}`);
   console.log(`Flask API Base URL configured as: ${FLASK_BASE_URL}`);
+  console.log(`Frontend accessible at http://localhost:${PORT}`);
 });

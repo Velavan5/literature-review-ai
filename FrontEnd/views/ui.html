@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Research Paper Search</title>
     <style>
-      /* CSS Variables (Keep As Is) */
       :root {
         --font-family-base: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
         --primary-color: #3a78c2; /* Main interactive blue */
@@ -32,7 +31,6 @@
         --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
       }
 
-      /* Base Styles (Keep As Is) */
       * { box-sizing: border-box; margin: 0; padding: 0; }
       html { scroll-behavior: smooth; }
       body {
@@ -50,7 +48,7 @@
         width: 100%; gap: 25px; align-items: flex-start;
       }
 
-      /* Sidebar Styles (Keep As Is) */
+      /* Sidebar Styles  */
       .sidebar {
         flex: 0 0 280px; background-color: var(--background-container);
         border-radius: var(--border-radius-lg); padding: 25px;
@@ -78,7 +76,7 @@
       .remove-file:hover { transform: scale(1.2); color: #a71d2a; }
       .no-files { color: var(--text-color-muted); font-style: italic; text-align: center; padding: 20px 10px; font-size: 0.9rem; }
 
-      /* Main Content Styles (Keep As Is) */
+      /* Main Content Styles  */
       .main {
         flex: 1 1 600px; min-width: 300px; background-color: var(--background-container);
         border-radius: var(--border-radius-lg); padding: 35px;
@@ -98,7 +96,7 @@
         box-shadow: 0 0 0 3px rgba(58, 120, 194, 0.15);
       }
 
-      /* --- NEW: Search Options Styling --- */
+      /* --- Search Options Styling --- */
       .search-options {
           display: flex;
           flex-wrap: wrap; /* Allow wrapping on small screens */
@@ -263,7 +261,7 @@
            </p>
         </section>
 
-        <button class="generate-btn" id="generate-btn">🚀 Generate Results</button>
+        <button class="generate-btn" id="generate-btn">🚀 Show Results</button>
 
         <section id="results-area" style="display: none;">
             <h2>Search Results</h2>
@@ -379,7 +377,6 @@
           }
       }
 
-      // --- Display Results Logic (Keep As Is) ---
       function displayResults(papers) {
           resultsContainer.innerHTML = '';
           if (!Array.isArray(papers) || papers.length === 0) {
@@ -407,7 +404,7 @@
           });
       }
 
-      // --- UI State Functions (Keep As Is) ---
+      // --- UI State Functions (
       function setLoadingState(isLoading) { /* ... */ }
       function displayError(message) { /* ... */ }
       function escapeHtml(unsafe) { /* ... */ }
