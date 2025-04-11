@@ -17,3 +17,4 @@ Thumbs.db
 node_modules
 package-lock.json
 downloaded_papers
+chroma_db_data
