@@ -1,145 +1,133 @@
+# semantic_api.py
 import requests
 import os
 import time
 import random
 import logging
 from dotenv import load_dotenv
+from pathlib import Path
 
 load_dotenv()
-# Use logging instead of print for better tracking, especially in Flask apps
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 SEMANTIC_SCHOLAR_API_URL = "https://api.semanticscholar.org/graph/v1"
 # SEMANTIC_SCHOLAR_API_KEY = os.getenv("SEMANTIC_SCHOLAR_API_KEY")
 
-# --- Configuration for Retries ---
-MAX_RETRIES = 5
+MAX_RETRIES = 4
 INITIAL_BACKOFF_SECONDS = 1
-# ---------------------------------
+BACKOFF_FACTOR = 2
 
 def search_papers(query: str, limit: int = 10) -> list | None:
     """
-    Searches for papers using the Semantic Scholar API with retries on failure,
-    attempting to retrieve direct PDF links where available.
+    Searches for papers using the Semantic Scholar API, then manually sorts
+    results by citation count descending. Includes retries and PDF link retrieval.
 
     Args:
         query: The search string.
         limit: The maximum number of papers to return.
 
     Returns:
-        A list of paper details (including 'pdfUrl' if available) if successful.
-        Returns None if the request fails after all retries.
-        Returns an empty list if the search is successful but finds no papers.
+        A list of paper details sorted by citation count desc, or None on failure.
     """
     endpoint = f"{SEMANTIC_SCHOLAR_API_URL}/paper/search"
+
+    # --- Parameters: REMOVED 'sort', kept 'citationCount' in 'fields' ---
     params = {
         'query': query,
         'limit': limit,
-        # *** UPDATED FIELDS ***
-        # Request fields needed, including open access info
-        'fields': 'paperId,url,title,abstract,authors,year,isOpenAccess,openAccessPdf'
+        # Still need citationCount to sort manually
+        'fields': 'paperId,url,title,abstract,authors,year,isOpenAccess,openAccessPdf,citationCount',
+        # 'sort': 'citationCount:desc' # <-- REMOVED API sorting parameter
     }
-    headers = {
-        # 'x-api-key': SEMANTIC_SCHOLAR_API_KEY # Uncomment if you have a key
-    }
-
+    headers = {  }
     current_backoff = INITIAL_BACKOFF_SECONDS
 
     for attempt in range(MAX_RETRIES + 1):
         try:
-            logging.info(f"Attempt {attempt+1}/{MAX_RETRIES+1}: Querying S2 API: query='{query}'")
-            response = requests.get(endpoint, params=params, headers=headers, timeout=25) # Increased timeout slightly
+            logging.info(f"Attempt {attempt+1}/{MAX_RETRIES+1}: Querying S2 API (Manual Sort Planned): query='{query}', limit={limit}")
+            prepared_request = requests.Request('GET', endpoint, params=params, headers=headers).prepare()
+            logging.debug(f"Requesting URL: {prepared_request.url}")
 
-            # --- Handle specific HTTP errors for retries ---
-            if response.status_code == 429:
-                logging.warning(f"Attempt {attempt+1} failed: 429 Too Many Requests.")
-                if attempt == MAX_RETRIES: break # Exit loop to return None
-                # Wait and prepare for next attempt
-                wait_time = current_backoff + random.uniform(0, 0.5)
-                logging.info(f"Waiting {wait_time:.2f} seconds...")
-                time.sleep(wait_time)
-                current_backoff *= 1.5
-                continue # Go to next attempt
+            response = requests.get(endpoint, params=params, headers=headers, timeout=30)
 
-            if response.status_code >= 500:
+            # --- Handle Retries (same as before) ---
+            if response.status_code == 429: # ... (retry logic) ...
+                 logging.warning(f"Attempt {attempt+1} failed: 429 Too Many Requests.")
+                 if attempt == MAX_RETRIES: break
+                 wait_time = current_backoff + random.uniform(0, 0.5); logging.info(f"Waiting {wait_time:.2f}s..."); time.sleep(wait_time); current_backoff *= BACKOFF_FACTOR; continue
+            if response.status_code >= 500: # ... (retry logic) ...
                  logging.warning(f"Attempt {attempt+1} failed: Server Error {response.status_code}.")
-                 if attempt == MAX_RETRIES: break # Exit loop to return None
-                 # Wait and prepare for next attempt
-                 wait_time = current_backoff + random.uniform(0, 0.5)
-                 logging.info(f"Waiting {wait_time:.2f} seconds...")
-                 time.sleep(wait_time)
-                 current_backoff *= 1.5
-                 continue
+                 if attempt == MAX_RETRIES: break
+                 wait_time = current_backoff + random.uniform(0, 0.5); logging.info(f"Waiting {wait_time:.2f}s..."); time.sleep(wait_time); current_backoff *= BACKOFF_FACTOR; continue
 
-            # --- If not a retryable error, raise it ---
-            response.raise_for_status() # Raises for other 4xx errors (400, 401, 403, 404 etc.)
+            response.raise_for_status()
 
             # --- Process successful response ---
             results = response.json()
-            papers_found = results.get('data', [])
-            logging.info(f"Attempt {attempt+1} successful. Received {len(papers_found)} results.")
+            papers_found_raw = results.get('data', [])
+            total_results = results.get('total', len(papers_found_raw))
+            logging.info(f"Attempt {attempt+1} successful. Received {len(papers_found_raw)} raw results (Total matching: {total_results}).")
 
-            # *** ADD PDF URL PROCESSING ***
+            # --- Process each paper (same as before) ---
             processed_papers = []
-            for paper in papers_found:
+            for paper in papers_found_raw:
+                if not isinstance(paper, dict): continue
+                processed_paper = {
+                    'paperId': paper.get('paperId'), 'url': paper.get('url'), 'title': paper.get('title'),
+                    'abstract': paper.get('abstract'), 'authors': paper.get('authors'), 'year': paper.get('year'),
+                    'isOpenAccess': paper.get('isOpenAccess'), 'citationCount': paper.get('citationCount'),
+                    'pdfUrl': None
+                }
                 pdf_info = paper.get('openAccessPdf')
-                paper['pdfUrl'] = None # Initialize pdfUrl key
                 if pdf_info and isinstance(pdf_info, dict) and pdf_info.get('url'):
-                    paper['pdfUrl'] = pdf_info['url']
-                    logging.debug(f"Found Open Access PDF for paperId {paper.get('paperId')}: {paper['pdfUrl']}")
-                else:
-                    logging.debug(f"No Open Access PDF found for paperId {paper.get('paperId')}")
-                # Optionally remove the raw openAccessPdf field if you don't need it
-                # paper.pop('openAccessPdf', None)
-                processed_papers.append(paper)
+                    processed_paper['pdfUrl'] = pdf_info['url']
+                processed_papers.append(processed_paper)
 
-            return processed_papers # Success! Return the processed list
+            # *** ADDED MANUAL SORTING STEP ***
+            try:
+                # Sort the list of dictionaries in-place
+                processed_papers.sort(
+                    # Key function: extract citationCount, treat None as -1 (goes last in desc sort)
+                    key=lambda p: p.get('citationCount') if p.get('citationCount') is not None else -1,
+                    reverse=True # Sort descending (highest citation count first)
+                )
+                logging.info(f"Manually sorted {len(processed_papers)} papers by citation count (desc).")
+            except TypeError as te:
+                # Handle potential type errors if citationCount isn't numeric (should be, but defensive)
+                 logging.error(f"TypeError during manual sorting: {te}. Returning results unsorted.", exc_info=True)
+            except Exception as e:
+                 logging.error(f"Unexpected error during manual sorting: {e}. Returning results unsorted.", exc_info=True)
+            # *** END MANUAL SORTING STEP ***
 
-        except requests.exceptions.Timeout:
-            logging.warning(f"Attempt {attempt+1} timed out.")
-            if attempt == MAX_RETRIES: break # Exit loop to return None
-            wait_time = current_backoff + random.uniform(0, 0.5)
-            logging.info(f"Waiting {wait_time:.2f} seconds...")
-            time.sleep(wait_time)
-            current_backoff *= 2
-            continue
+            return processed_papers # Return the (now sorted) list
 
-        except requests.exceptions.RequestException as e:
-            logging.error(f"Attempt {attempt+1} failed with RequestException: {e}", exc_info=True)
-            # Decide if you want to retry on generic RequestException or not
-            # For now, we break and return None on the first occurrence
-            return None # Fail immediately on other network errors
+        except requests.exceptions.Timeout: # ... (timeout handling) ...
+             logging.warning(f"Attempt {attempt+1} timed out.")
+             if attempt == MAX_RETRIES: break
+             wait_time = current_backoff + random.uniform(0, 0.5); logging.info(f"Waiting {wait_time:.2f}s..."); time.sleep(wait_time); current_backoff *= BACKOFF_FACTOR; continue
+        except requests.exceptions.RequestException as e: # ... (other request error handling) ...
+             logging.error(f"Attempt {attempt+1} failed with RequestException: {e}", exc_info=True)
+             return None
 
-    # If loop finished due to max retries on 429 or 5xx
+    # Failure after all retries
     logging.error(f"Failed to retrieve papers for query '{query}' after {MAX_RETRIES+1} attempts.")
     return None
 
-# Example usage (for testing this file directly)
+# --- Example Usage (Corrected, same as before) ---
 if __name__ == '__main__':
-    test_query = "explainable ai techniques survey"
-    papers = search_papers(test_query, limit=3)
-
-    if papers is None:
-        print(f"\n[RESULT] Failed to retrieve papers for '{test_query}' after retries.")
-    elif not papers: # Empty list
-         print(f"\n[RESULT] Successfully queried, but found 0 papers for '{test_query}'.")
+    test_query = "large language models for code generation"
+    print(f"\nTesting semantic_api.py with query: '{test_query}' (Manual Sort)")
+    print("-" * 30)
+    papers_result = search_papers(test_query, limit=5)
+    print("-" * 30)
+    if papers_result is None: print(f"[RESULT] Failed to retrieve papers for '{test_query}' after retries.")
+    elif not papers_result: print(f"[RESULT] Successfully queried, but found 0 papers for '{test_query}'.")
     else:
-        print(f"\n[RESULT] Found {len(papers)} papers for '{test_query}':")
-        for i in papers[0]:
-            print("key: ",i)
-        exit(0)
-        for i, paper in enumerate(papers[0]):
-            print("key: ",paper)
-            print("fetched result: ")
-            print(i,".) ",paper)
-            title = paper.get('title', 'N/A')
-            year = paper.get('year', 'N/A')
-            # Access the new pdfUrl field
-            pdf_url = paper.get('pdfUrl', 'Not Available')
-            # Also show if it's marked as Open Access
-            is_oa = paper.get('isOpenAccess', False)
-            print(f"  {i+1}. {title} ({year})")
-            print(f"     Open Access: {is_oa}")
-            print(f"     PDF Link: {pdf_url}")
-            # print(f"     Abstract: {paper.get('abstract')[:100]}...") # Optional
-            print("-" * 10)
+        print(f"[RESULT] Found {len(papers_result)} papers for '{test_query}' (MANUALLY sorted by citation count desc):")
+        for i, paper in enumerate(papers_result):
+            # ...(same printing logic as before, displaying citation count)...
+            title = paper.get('title', 'N/A'); year = paper.get('year', 'N/A'); citations = paper.get('citationCount', 'N/A')
+            is_oa = paper.get('isOpenAccess', False); pdf_url = paper.get('pdfUrl', 'Not Available')
+            authors_list = paper.get('authors', []); author_names = [a.get('name', '?') for a in authors_list if isinstance(a, dict)] if isinstance(authors_list, list) else []
+            print(f"\n  {i+1}. {title}"); print(f"     Year: {year} | Citations: {citations}"); print(f"     Authors: {', '.join(author_names) if author_names else 'N/A'}"); print(f"     Open Access: {is_oa}"); print(f"     PDF Link: {pdf_url}")
+    print("\nScript finished.")

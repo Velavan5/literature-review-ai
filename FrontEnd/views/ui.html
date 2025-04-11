@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Research Paper Search</title>
+    <title>Research Paper Search & Review</title>
     <style>
       :root {
         --font-family-base: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
@@ -19,9 +19,11 @@
         --text-color-muted: #6c757d;
         --success-color: #28a745;
         --success-darker: #218838;
+        --info-color: #17a2b8;    /* Color for Generate Review Button */
+        --info-darker: #117a8b;
         --danger-color: #dc3545;
         --danger-background: #f8d7da;
-        --info-color: #004085;
+        --info-text-color: #004085; /* Color for loading/status text */
         --info-background: #cce5ff;
 
         --border-radius-sm: 0.25rem; /* 4px */
@@ -34,40 +36,29 @@
       * { box-sizing: border-box; margin: 0; padding: 0; }
       html { scroll-behavior: smooth; }
       body {
-        padding: 20px;
-        font-family: var(--font-family-base);
-        background-color: var(--background-body);
-        display: flex;
-        justify-content: center;
-        color: var(--text-color-base);
-        line-height: 1.6;
-        font-size: 15px;
+        padding: 20px; font-family: var(--font-family-base); background-color: var(--background-body);
+        display: flex; justify-content: center; color: var(--text-color-base);
+        line-height: 1.6; font-size: 15px;
       }
       .app-container {
         display: flex; flex-wrap: wrap; max-width: 1200px;
         width: 100%; gap: 25px; align-items: flex-start;
       }
 
-      /* Sidebar Styles  */
+      /* Sidebar Styles */
       .sidebar {
-        flex: 0 0 280px; background-color: var(--background-container);
-        border-radius: var(--border-radius-lg); padding: 25px;
-        box-shadow: var(--shadow-md); display: flex; flex-direction: column;
-        max-height: 85vh;
+        flex: 0 0 280px; background-color: var(--background-container); border-radius: var(--border-radius-lg);
+        padding: 25px; box-shadow: var(--shadow-md); display: flex; flex-direction: column; max-height: 85vh;
       }
       .sidebar-header {
-        font-size: 1.1rem; font-weight: 600; color: var(--primary-color);
-        margin-bottom: 15px; padding-bottom: 10px;
-        border-bottom: 1px solid var(--border-color-light);
+        font-size: 1.1rem; font-weight: 600; color: var(--primary-color); margin-bottom: 15px;
+        padding-bottom: 10px; border-bottom: 1px solid var(--border-color-light);
       }
       .file-list { flex-grow: 1; overflow-y: auto; padding-right: 5px; }
-      .file-list::-webkit-scrollbar { width: 6px; }
-      .file-list::-webkit-scrollbar-track { background: transparent; }
-      .file-list::-webkit-scrollbar-thumb { background-color: var(--border-color-medium); border-radius: 10px; }
+      .file-list::-webkit-scrollbar { width: 6px; } .file-list::-webkit-scrollbar-track { background: transparent; } .file-list::-webkit-scrollbar-thumb { background-color: var(--border-color-medium); border-radius: 10px; }
       .file-item {
-        background-color: #eef5ff; border-radius: var(--border-radius-md);
-        padding: 10px 15px; margin-bottom: 10px; display: flex;
-        justify-content: space-between; align-items: center; font-size: 0.9rem;
+        background-color: #eef5ff; border-radius: var(--border-radius-md); padding: 10px 15px; margin-bottom: 10px;
+        display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;
         transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease;
       }
       .file-item:hover { background-color: #dbe9ff; box-shadow: var(--shadow-sm); }
@@ -76,88 +67,40 @@
       .remove-file:hover { transform: scale(1.2); color: #a71d2a; }
       .no-files { color: var(--text-color-muted); font-style: italic; text-align: center; padding: 20px 10px; font-size: 0.9rem; }
 
-      /* Main Content Styles  */
+      /* Main Content Styles */
       .main {
         flex: 1 1 600px; min-width: 300px; background-color: var(--background-container);
-        border-radius: var(--border-radius-lg); padding: 35px;
-        box-shadow: var(--shadow-md); display: flex; flex-direction: column;
-        gap: 30px;
+        border-radius: var(--border-radius-lg); padding: 35px; box-shadow: var(--shadow-md);
+        display: flex; flex-direction: column; gap: 30px;
       }
       label { font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 10px; color: #495057; }
       textarea {
-        width: 100%; min-height: 140px; padding: 15px; font-size: 0.95rem;
-        line-height: 1.6; border-radius: var(--border-radius-md);
-        border: 1px solid var(--border-color-medium); background-color: var(--background-alt);
-        transition: border-color 0.3s ease, box-shadow 0.3s ease; resize: vertical;
+        width: 100%; min-height: 140px; padding: 15px; font-size: 0.95rem; line-height: 1.6;
+        border-radius: var(--border-radius-md); border: 1px solid var(--border-color-medium);
+        background-color: var(--background-alt); transition: border-color 0.3s ease, box-shadow 0.3s ease; resize: vertical;
       }
       textarea:focus {
-        border-color: var(--primary-color); outline: none;
-        background-color: var(--background-container);
+        border-color: var(--primary-color); outline: none; background-color: var(--background-container);
         box-shadow: 0 0 0 3px rgba(58, 120, 194, 0.15);
       }
 
-      /* --- Search Options Styling --- */
+      /* Search Options Styling */
       .search-options {
-          display: flex;
-          flex-wrap: wrap; /* Allow wrapping on small screens */
-          gap: 20px 30px; /* Vertical and horizontal gap */
-          align-items: center;
-          padding: 15px;
-          background-color: var(--background-alt);
-          border-radius: var(--border-radius-md);
-          border: 1px solid var(--border-color-light);
+          display: flex; flex-wrap: wrap; gap: 20px 30px; align-items: center; padding: 15px;
+          background-color: var(--background-alt); border-radius: var(--border-radius-md); border: 1px solid var(--border-color-light);
       }
-
-      .option-group {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-      }
-
-      .option-group label {
-          margin-bottom: 0; /* Remove bottom margin for inline labels */
-          font-weight: 500; /* Slightly lighter weight */
-          font-size: 0.9rem;
-          color: var(--text-color-base);
-      }
-
-      /* Style for number input */
+      .option-group { display: flex; align-items: center; gap: 10px; }
+      .option-group label { margin-bottom: 0; font-weight: 500; font-size: 0.9rem; color: var(--text-color-base); }
       input[type="number"] {
-          padding: 6px 10px;
-          font-size: 0.9rem;
-          border-radius: var(--border-radius-sm);
-          border: 1px solid var(--border-color-medium);
-          width: 70px; /* Fixed width for number input */
-          text-align: center;
+          padding: 6px 10px; font-size: 0.9rem; border-radius: var(--border-radius-sm);
+          border: 1px solid var(--border-color-medium); width: 70px; text-align: center;
           transition: border-color 0.2s ease, box-shadow 0.2s ease;
       }
-       input[type="number"]:focus {
-           border-color: var(--primary-color);
-           outline: none;
-           box-shadow: 0 0 0 2px rgba(58, 120, 194, 0.15);
-       }
+      input[type="number"]:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 2px rgba(58, 120, 194, 0.15); }
+      .checkbox-label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; font-size: 0.9rem; color: var(--text-color-base); }
+      input[type="checkbox"] { cursor: pointer; width: 1em; height: 1em; accent-color: var(--primary-color); margin-top: -1px; }
 
-      /* Style for checkbox label container */
-       .checkbox-label {
-          display: inline-flex; /* Align checkbox and text */
-          align-items: center;
-          gap: 8px;
-          cursor: pointer;
-          font-weight: 500;
-          font-size: 0.9rem;
-          color: var(--text-color-base);
-       }
-       /* Style checkbox itself */
-       input[type="checkbox"] {
-           cursor: pointer;
-           width: 1em; /* Adjust size relative to font */
-           height: 1em;
-           accent-color: var(--primary-color); /* Modern way to color checkbox */
-           margin-top: -1px; /* Fine-tune vertical alignment */
-       }
-
-
-      /* File Upload (Keep As Is) */
+      /* File Upload */
       .file-upload-container {
         border: 2px dashed var(--border-color-light); padding: 25px; text-align: center;
         border-radius: var(--border-radius-lg); transition: background-color 0.2s ease, border-color 0.2s ease;
@@ -166,32 +109,45 @@
       .file-upload-container:hover { background-color: #f5faff; border-color: #a8c7e9; }
       input[type="file"] { display: none; }
       .file-upload-label {
-        display: inline-block; padding: 10px 22px; background-color: var(--primary-color);
-        color: white; font-weight: 500; border-radius: var(--border-radius-md); cursor: pointer;
+        display: inline-block; padding: 10px 22px; background-color: var(--primary-color); color: white;
+        font-weight: 500; border-radius: var(--border-radius-md); cursor: pointer;
         transition: background-color 0.2s ease, transform 0.1s ease; font-size: 0.9rem;
       }
       .file-upload-label:hover { background-color: var(--primary-darker); transform: translateY(-1px); }
 
-      /* Button (Keep As Is) */
-      .generate-btn {
-        background-color: var(--success-color); color: white; padding: 12px 30px;
-        border: none; border-radius: var(--border-radius-md); font-size: 1rem;
-        font-weight: 600; cursor: pointer; align-self: flex-start;
-        transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
-        letter-spacing: 0.5px;
+      /* Action Buttons Container */
+      .action-buttons { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+      /* Shared Button Styles */
+      .action-btn {
+         padding: 12px 30px; border: none; border-radius: var(--border-radius-md); font-size: 1rem;
+         font-weight: 600; cursor: pointer; align-self: flex-start;
+         transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+         letter-spacing: 0.5px; color: white;
       }
-      .generate-btn:hover:not(:disabled) { background-color: var(--success-darker); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2); }
-      .generate-btn:disabled { background-color: #a3d9b1; cursor: not-allowed; transform: none; box-shadow: none; }
+      .action-btn:disabled { background-color: #ccc; color: #888; cursor: not-allowed; transform: none; box-shadow: none; }
+      /* Specific Button Styles */
+      .show-results-btn { background-color: var(--success-color); }
+      .show-results-btn:hover:not(:disabled) { background-color: var(--success-darker); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2); }
+      .generate-review-btn { background-color: var(--info-color); }
+      .generate-review-btn:hover:not(:disabled) { background-color: var(--info-darker); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(23, 162, 184, 0.2); }
 
-      /* Results Area Styles (Keep As Is) */
+       /* Helper text for generate review button */
+       .generate-review-helper {
+           font-size: 0.85rem;
+           color: var(--text-color-muted);
+           margin-top: -20px; /* Adjust spacing relative to buttons */
+           margin-bottom: 10px; /* Add some space below */
+       }
+
+      /* Results Area Styles */
       #results-area { margin-top: 25px; border-top: 1px solid var(--border-color-light); padding-top: 25px; }
       #results-area h2 { font-size: 1.2rem; font-weight: 600; color: var(--primary-color); margin-bottom: 20px; }
       #results-container { display: flex; flex-direction: column; gap: 25px; }
       .paper-item { background-color: var(--background-container); border: 1px solid var(--border-color-light); border-radius: var(--border-radius-md); padding: 20px 25px; transition: box-shadow 0.25s ease, border-color 0.25s ease; }
       .paper-item:hover { box-shadow: var(--shadow-md); border-color: var(--border-color-medium); }
       .paper-title { font-size: 1.1rem; font-weight: 600; color: #212529; margin-bottom: 8px; line-height: 1.4; }
-      .paper-meta { font-size: 0.85rem; color: var(--text-color-muted); margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 8px 20px; }
-      .paper-meta span { display: inline-block; }
+      .paper-meta { font-size: 0.85rem; color: var(--text-color-muted); margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; } /* Added align-items */
+      .paper-meta span { display: inline-flex; align-items: center; gap: 4px; } /* Use flex for icon alignment */
       .paper-meta strong { font-weight: 500; color: #495057; }
       .paper-authors { font-style: normal; }
       .paper-abstract { font-size: 0.95rem; line-height: 1.7; color: #495057; margin-bottom: 15px; max-height: 7.5em; overflow: hidden; cursor: pointer; position: relative; transition: max-height 0.3s ease-out; }
@@ -201,11 +157,19 @@
       .paper-actions a { display: inline-flex; align-items: center; gap: 5px; background-color: var(--primary-color); color: white; padding: 7px 15px; border-radius: var(--border-radius-md); font-size: 0.85rem; font-weight: 500; text-decoration: none; transition: background-color 0.2s ease, transform 0.1s ease; margin-top: 5px; }
       .paper-actions a:hover { background-color: var(--primary-darker); transform: translateY(-1px); }
       .paper-actions .no-pdf { font-size: 0.85rem; color: var(--text-color-muted); font-style: italic; margin-top: 5px; display: inline-block; }
-      #loading-indicator, #error-message { margin-top: 20px; padding: 12px 20px; border-radius: var(--border-radius-md); text-align: center; font-size: 0.95rem; font-weight: 500; }
-      #loading-indicator { color: var(--info-color); background-color: var(--info-background); border: 1px solid #bee5eb; }
-      #error-message { color: var(--danger-color); background-color: var(--danger-background); border: 1px solid #f5c6cb; }
 
-      /* Responsive (Keep As Is) */
+      /* Loading/Error/Status Indicators */
+      #loading-indicator, #error-message, #review-status { margin-top: 20px; padding: 12px 20px; border-radius: var(--border-radius-md); text-align: center; font-size: 0.95rem; font-weight: 500; }
+      #loading-indicator { color: var(--info-text-color); background-color: var(--info-background); border: 1px solid #bee5eb; }
+      #error-message, #review-status.error { color: var(--danger-color); background-color: var(--danger-background); border: 1px solid #f5c6cb; }
+      #review-status.info { color: var(--info-text-color); background-color: var(--info-background); border: 1px solid #bee5eb; }
+
+      /* Review Output Area */
+      #review-output { margin-top: 15px; background-color: #eef5ff; /* Light blue background */ border: 1px solid #a8c7e9; border-radius: var(--border-radius-md); padding: 20px; white-space: pre-wrap; font-family: var(--font-family-base); /* Use base font */ font-size: 0.95rem; line-height: 1.7; display: none; max-height: 500px; overflow-y: auto; }
+      #review-output h3 { margin-bottom: 15px; font-size: 1.1rem; color: var(--primary-darker); }
+
+
+      /* Responsive */
       @media (max-width: 768px) {
         body { padding: 15px; }
         .app-container { flex-direction: column; gap: 15px; }
@@ -213,55 +177,47 @@
         .sidebar { max-height: 40vh; }
         .paper-meta { font-size: 0.8rem; }
         .paper-title { font-size: 1rem; }
-        .search-options { flex-direction: column; align-items: flex-start; } /* Stack options vertically */
+        .search-options { flex-direction: column; align-items: flex-start; }
+        .action-buttons { justify-content: center; }
       }
-
     </style>
   </head>
   <body>
     <div class="app-container">
       <aside class="sidebar">
-        <div class="sidebar-header">📁 Uploaded Files</div>
+        <div class="sidebar-header">📁 Uploaded PDF Files</div>
         <div class="file-list" id="file-list">
-          <div class="no-files">No files uploaded yet</div>
+          <div class="no-files">No PDF files uploaded yet</div>
         </div>
       </aside>
 
       <main class="main">
         <section>
-          <label for="query-textarea">📝 Enter Query or Keywords</label>
-          <textarea
-            name="query"
-            id="query-textarea"
-            placeholder="Enter keywords, a paper title ..."
-            rows="5"
-          ></textarea>
+          <label for="query-textarea">📝 Enter Query or Keywords (for Search)</label>
+          <textarea name="query" id="query-textarea" placeholder="Enter keywords, a paper title..." rows="5"></textarea>
         </section>
 
         <section class="search-options">
-            <div class="option-group">
-                <label for="limit-input">Max Results:</label>
-                <input type="number" id="limit-input" name="limit" value="15" min="1" max="100">
-            </div>
-            <div class="option-group">
-                 <label class="checkbox-label" for="require-pdf-checkbox">
-                    <input type="checkbox" id="require-pdf-checkbox" name="requirePdf">
-                    Only show papers with PDF links
-                 </label>
-            </div>
+             <div class="option-group"> <label for="limit-input">Max Results:</label> <input type="number" id="limit-input" name="limit" value="15" min="1" max="100"> </div>
+             <div class="option-group"> <label class="checkbox-label" for="require-pdf-checkbox"> <input type="checkbox" id="require-pdf-checkbox" name="requirePdf"> Only show papers with PDF links </label> </div>
         </section>
 
         <section class="file-upload-container">
-          <label class="file-upload-label" for="optional-file">
-            📤 Choose Files (Optional)
-          </label>
-          <input type="file" id="optional-file" multiple accept=".pdf,.txt" />
-           <p style="font-size: 12px; color: #667; margin-top: 10px;">
-               (Files are only listed here, not processed by search yet)
-           </p>
+            <label class="file-upload-label" for="optional-file"> 📤 Choose PDF Files </label>
+            <input type="file" id="optional-file" multiple accept=".pdf" />
+            <p style="font-size: 12px; color: #667; margin-top: 10px;"> (Select local PDFs to upload for review generation) </p>
         </section>
 
-        <button class="generate-btn" id="generate-btn">🚀 Show Results</button>
+        <div class="action-buttons">
+            <button class="action-btn show-results-btn" id="show-results-btn">🚀 Show Search Results</button>
+            <button class="action-btn generate-review-btn" id="generate-review-btn">📄 Generate Review</button>
+        </div>
+        <p class="generate-review-helper"> Generates review for the first uploaded PDF, or uses the first search result with a PDF link if no files are uploaded. </p>
+
+
+        <div id="review-status" style="display: none;"></div>
+        <div id="review-output" style="display: none;"></div>
+
 
         <section id="results-area" style="display: none;">
             <h2>Search Results</h2>
@@ -270,176 +226,270 @@
             <div id="results-container">
                 </div>
         </section>
-
       </main>
     </div>
 
     <script>
-        // --- Element References ---
+      // --- Element References ---
       const fileList = document.getElementById("file-list");
       const optionalFileInput = document.getElementById("optional-file");
-      const generateBtn = document.getElementById('generate-btn');
+      const showResultsBtn = document.getElementById('show-results-btn');
       const queryTextarea = document.getElementById('query-textarea');
       const resultsArea = document.getElementById('results-area');
       const resultsContainer = document.getElementById('results-container');
       const loadingIndicator = document.getElementById('loading-indicator');
       const errorMessage = document.getElementById('error-message');
-      // **NEW**: Get references to new inputs
       const limitInput = document.getElementById('limit-input');
       const requirePdfCheckbox = document.getElementById('require-pdf-checkbox');
+      const generateReviewBtn = document.getElementById('generate-review-btn');
+      const reviewStatus = document.getElementById('review-status');
+      const reviewOutput = document.getElementById('review-output');
 
-      // --- File Upload Logic (Keep As Is) ---
-      const uploadedFiles = new Map();
+      // --- State Variables ---
+      const uploadedFiles = new Map(); // Stores File objects: { name: File }
+      let currentSearchResults = []; // Store search results
+
+      // --- Event Listeners ---
       optionalFileInput.addEventListener("change", handleFileUploadChange);
+      showResultsBtn.addEventListener('click', handleSearch);
+      generateReviewBtn.addEventListener('click', handleGenerateReview);
+
+      // --- File Upload Logic ---
       function handleFileUploadChange() {
-        const files = optionalFileInput.files;
-        if (files.length > 0) {
-          const noFilesMsg = fileList.querySelector(".no-files");
-          if (noFilesMsg) noFilesMsg.remove();
-          for (let i = 0; i < files.length; i++) {
-              const file = files[i];
-              if (!uploadedFiles.has(file.name)) {
-                 addFileToSidebar(file);
-                 uploadedFiles.set(file.name, file);
-              } else { console.warn(`File "${file.name}" already added.`); }
-          }
-        }
-        optionalFileInput.value = "";
+           const files = optionalFileInput.files;
+           if (files.length > 0) {
+               const noFilesMsg = fileList.querySelector(".no-files");
+               if (noFilesMsg) noFilesMsg.remove();
+               for (const file of files) {
+                   if (file.type !== 'application/pdf') {
+                       alert(`File "${file.name}" is not a PDF and was ignored.`);
+                       continue;
+                   }
+                   if (!uploadedFiles.has(file.name)) {
+                       addFileToSidebar(file);
+                       uploadedFiles.set(file.name, file);
+                   } else { console.warn(`File "${file.name}" already added.`); }
+               }
+           }
+           optionalFileInput.value = ""; // Reset file input
+           checkShowNoFilesMessage();
       }
       function addFileToSidebar(file) {
-        const item = document.createElement("div"); item.className = "file-item"; item.dataset.filename = file.name;
-        const nameSpan = document.createElement("span"); nameSpan.className = "file-name"; nameSpan.textContent = file.name; nameSpan.title = file.name;
-        const removeBtn = document.createElement("span"); removeBtn.className = "remove-file"; removeBtn.innerHTML = "&#x1F5D1;&#xFE0F;"; removeBtn.title = "Remove file"; removeBtn.setAttribute('role', 'button'); removeBtn.setAttribute('aria-label', `Remove ${file.name}`);
-        removeBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          const confirmed = confirm(`Are you sure you want to remove "${file.name}"?`);
-          if (confirmed) { item.remove(); uploadedFiles.delete(file.name); checkShowNoFilesMessage(); }
-        });
-        item.appendChild(nameSpan); item.appendChild(removeBtn); fileList.appendChild(item);
+           const item = document.createElement("div"); item.className = "file-item"; item.dataset.filename = file.name;
+           const nameSpan = document.createElement("span"); nameSpan.className = "file-name"; nameSpan.textContent = file.name; nameSpan.title = file.name;
+           const removeBtn = document.createElement("span"); removeBtn.className = "remove-file"; removeBtn.innerHTML = "&#x1F5D1;&#xFE0F;"; removeBtn.title = "Remove file"; removeBtn.setAttribute('role', 'button'); removeBtn.setAttribute('aria-label', `Remove ${file.name}`);
+           removeBtn.addEventListener("click", (e) => {
+               e.stopPropagation();
+               item.remove();
+               uploadedFiles.delete(file.name);
+               checkShowNoFilesMessage();
+           });
+           item.appendChild(nameSpan); item.appendChild(removeBtn); fileList.appendChild(item);
       }
-      function checkShowNoFilesMessage() {
-         if (fileList.querySelectorAll(".file-item").length === 0) {
-            const noFilesMsg = document.createElement("div"); noFilesMsg.className = "no-files"; noFilesMsg.textContent = "No files uploaded yet"; fileList.appendChild(noFilesMsg);
-         }
-      }
-
-      // --- Search Query Logic (Updated) ---
-      generateBtn.addEventListener('click', handleSearch);
-
-      async function handleSearch() {
-          const query = queryTextarea.value.trim();
-          // **NEW**: Read values from new inputs
-          const limitValue = parseInt(limitInput.value, 10) || 15; // Default to 15 if invalid
-          const requirePdfValue = requirePdfCheckbox.checked; // true or false
-
-          if (!query) {
-              displayError("Please enter a query or abstract.");
-              queryTextarea.focus();
-              return;
-          }
-           if (limitValue <= 0 || limitValue > 100) { // Basic validation for limit
-               displayError("Please enter a number of results between 1 and 100.");
-               limitInput.focus();
-               return;
+       function checkShowNoFilesMessage() {
+           if (uploadedFiles.size === 0) {
+               if (!fileList.querySelector(".no-files")) {
+                    const noFilesMsg = document.createElement("div"); noFilesMsg.className = "no-files"; noFilesMsg.textContent = "No PDF files uploaded yet"; fileList.appendChild(noFilesMsg);
+               }
+           } else {
+                const noFilesMsg = fileList.querySelector(".no-files");
+                if (noFilesMsg) noFilesMsg.remove();
            }
+       }
 
-          setLoadingState(true);
+      // --- Search Query Logic ---
+      async function handleSearch() {
+           const query = queryTextarea.value.trim();
+           const limitValue = parseInt(limitInput.value, 10) || 15;
+           const requirePdfValue = requirePdfCheckbox.checked;
+           if (!query) { displaySearchError("Please enter a query..."); return; }
+           if (limitValue <= 0 || limitValue > 100) { displaySearchError("Limit must be 1-100."); return; }
+           setSearchLoadingState(true);
+           currentSearchResults = []; // Clear previous results
+           try {
+               // Fetch from Node.js server's /search endpoint
+               const response = await fetch('/search', {
+                   method: 'POST',
+                   headers: { 'Content-Type': 'application/json' },
+                   body: JSON.stringify({ query: query, limit: limitValue, requirePdf: requirePdfValue })
+               });
+               if (!response.ok) {
+                   let errorData; try { errorData = await response.json(); } catch { errorData = { error: `Server error: ${response.status}` }; }
+                   throw new Error(errorData.error || `Server error: ${response.status}`);
+               }
+               const papers = await response.json();
+               currentSearchResults = papers; // Store results
+               displaySearchResults(papers); // Display results
+           } catch (error) {
+               console.error('Search Error:', error);
+               displaySearchError(`Failed to fetch results: ${error.message}`);
+               currentSearchResults = []; // Clear on error
+           } finally {
+               setSearchLoadingState(false);
+           }
+       }
 
-          try {
-              const response = await fetch('/search', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  // **UPDATED**: Send query, limit, and requirePdf flag in the body
-                  body: JSON.stringify({
-                      query: query,
-                      limit: limitValue,
-                      requirePdf: requirePdfValue // Send boolean flag
-                  })
-              });
+      // --- Display Search Results Function ---
+      function displaySearchResults(papers) {
+          resultsContainer.innerHTML = ''; // Clear previous results
+          errorMessage.style.display = 'none'; // Hide error message
 
-              if (!response.ok) {
-                  let errorData = { message: `Server error: ${response.status}` };
-                  try {
-                      const serverError = await response.json();
-                      errorData.message = serverError.error || errorData.message;
-                  } catch (e) { /* Ignore parsing error */ }
-                  throw new Error(errorData.message);
-              }
-
-              const papers = await response.json();
-              displayResults(papers);
-
-          } catch (error) {
-              console.error('Search Error:', error);
-              displayError(`Failed to fetch results: ${error.message}`);
-          } finally {
-              setLoadingState(false);
-          }
-      }
-
-      function displayResults(papers) {
-          resultsContainer.innerHTML = '';
           if (!Array.isArray(papers) || papers.length === 0) {
-              resultsContainer.innerHTML = '<p style="text-align: center; color: #777;">No relevant papers found matching your criteria.</p>'; // Updated message
+              resultsContainer.innerHTML = '<p style="text-align: center; color: #777;">No relevant papers found matching your search criteria.</p>';
               return;
           }
+
           papers.forEach(paper => {
-              const paperDiv = document.createElement('div'); paperDiv.className = 'paper-item';
+              const paperDiv = document.createElement('div');
+              paperDiv.className = 'paper-item';
+
               const title = escapeHtml(paper.title || 'No Title Provided');
               const year = escapeHtml(paper.year || 'N/A');
               const authors = Array.isArray(paper.authors) ? escapeHtml(paper.authors.join(', ')) : 'No Authors Listed';
               const abstractText = escapeHtml(paper.abstract || 'No Abstract Available');
-              const abstractDiv = document.createElement('div'); abstractDiv.className = 'paper-abstract'; abstractDiv.innerHTML = abstractText;
-              if (abstractText.length > 350) {
+              const citations = paper.citationCount; // Assumes backend sends this
+              const citationsText = (citations === null || citations === undefined) ? 'N/A' : citations;
+              const pdfUrl = paper.pdfUrl;
+
+              const abstractDiv = document.createElement('div');
+              abstractDiv.className = 'paper-abstract';
+              abstractDiv.innerText = abstractText;
+              if (abstractText.length > 300) {
                    abstractDiv.title = 'Click to expand/collapse abstract';
                    abstractDiv.addEventListener('click', () => abstractDiv.classList.toggle('expanded'));
-              } else { abstractDiv.classList.add('expanded'); abstractDiv.style.cursor = 'default'; }
-              const pdfUrl = paper.pdfUrl;
-              paperDiv.innerHTML = `<div class="paper-title">${title}</div><div class="paper-meta"><span class="paper-year"><strong>Year:</strong> ${year}</span><span class="paper-authors"><strong>Authors:</strong> ${authors}</span></div>`;
+              } else {
+                   abstractDiv.classList.add('expanded');
+                   abstractDiv.style.cursor = 'default';
+              }
+
+              // Build inner HTML for title and metadata line
+              paperDiv.innerHTML = `
+                  <div class="paper-title">${title}</div>
+                  <div class="paper-meta">
+                      <span class="paper-year">🗓️ <strong>Year:</strong> ${year}</span>
+                      <span class="paper-authors">👥 <strong>Authors:</strong> ${authors}</span>
+                      <span class="paper-citations">📊 <strong>Citations:</strong> ${citationsText}</span>
+                  </div>
+              `;
+
+              // Append abstract and actions after setting innerHTML
               paperDiv.appendChild(abstractDiv);
-              const actionsDiv = document.createElement('div'); actionsDiv.className = 'paper-actions';
-              actionsDiv.innerHTML = `${pdfUrl ? `<a href="${pdfUrl}" target="_blank" rel="noopener noreferrer" title="Opens PDF in a new tab">⬇️ Open PDF</a>` : '<span class="no-pdf">No direct PDF link found</span>'}`;
+              const actionsDiv = document.createElement('div');
+              actionsDiv.className = 'paper-actions';
+              actionsDiv.innerHTML = `
+                  ${pdfUrl ?
+                      `<a href="${pdfUrl}" target="_blank" rel="noopener noreferrer" title="Opens PDF in a new tab">⬇️ Open PDF</a>` :
+                      '<span class="no-pdf">No direct PDF link found</span>'
+                  }
+              `;
               paperDiv.appendChild(actionsDiv);
+
               resultsContainer.appendChild(paperDiv);
           });
       }
 
-      // --- UI State Functions (
-      function setLoadingState(isLoading) { /* ... */ }
-      function displayError(message) { /* ... */ }
-      function escapeHtml(unsafe) { /* ... */ }
 
-      // Re-include functions that might have been omitted in abbreviation
-       function setLoadingState(isLoading) {
+      // --- Review Generation Logic ---
+      async function handleGenerateReview() {
+           let sourceFound = false;
+           // Priority 1: Local File
+           if (uploadedFiles.size > 0) {
+               const firstFileEntry = uploadedFiles.values().next();
+               if (firstFileEntry.value) {
+                   sourceFound = true;
+                   console.log("Review source: First uploaded file.");
+                   await generateReviewFromFile(firstFileEntry.value);
+               }
+           }
+           // Priority 2: Search Result URL
+           if (!sourceFound) {
+               if (currentSearchResults.length > 0) {
+                    const paperWithPdf = currentSearchResults.find(paper => paper && paper.pdfUrl);
+                    if (paperWithPdf) {
+                        sourceFound = true;
+                        console.log("Review source: First search result with PDF URL.");
+                        await generateReviewFromUrl(paperWithPdf.pdfUrl);
+                    }
+               }
+           }
+           // No Source Found
+           if (!sourceFound) {
+               console.log("Review source: None found.");
+               displayReviewStatus("Please upload a PDF file or perform a search returning PDF links first.", true);
+           }
+      }
+
+      async function generateReviewFromFile(fileToProcess) {
+           console.log(`Processing file: ${fileToProcess.name}`);
+           setReviewLoadingState(true, `Processing ${fileToProcess.name}...`);
+           const formData = new FormData();
+           formData.append('pdfFile', fileToProcess); // Key must match multer in server.js
+           try {
+               // Fetch to Node.js endpoint for file review
+               const response = await fetch('/generate-review', { method: 'POST', body: formData });
+               const result = await response.json();
+               if (!response.ok) throw new Error(result.error || `Server error: ${response.status}`);
+               displayReviewOutput(result.review);
+           } catch (error) {
+               console.error('Review Generation Error (File):', error);
+               displayReviewStatus(`Error generating review from file: ${error.message}`, true);
+           } finally {
+               setReviewLoadingState(false);
+           }
+      }
+
+      async function generateReviewFromUrl(pdfUrl) {
+           console.log(`Processing URL: ${pdfUrl}`);
+           setReviewLoadingState(true, `Processing PDF from search result...`);
+           try {
+                // Fetch to Node.js endpoint for URL review
+               const response = await fetch('/generate-review-url', {
+                   method: 'POST',
+                   headers: { 'Content-Type': 'application/json' },
+                   body: JSON.stringify({ pdfUrl: pdfUrl })
+               });
+               const result = await response.json();
+               if (!response.ok) throw new Error(result.error || `Server error: ${response.status}`);
+               displayReviewOutput(result.review);
+           } catch (error) {
+               console.error('Review Generation Error (URL):', error);
+               displayReviewStatus(`Error generating review from URL: ${error.message}`, true);
+           } finally {
+               setReviewLoadingState(false);
+           }
+      }
+
+
+      // --- UI State Functions ---
+      function setSearchLoadingState(isLoading) {
+           if (isLoading) { showResultsBtn.disabled = true; resultsArea.style.display = 'block'; loadingIndicator.style.display = 'block'; errorMessage.style.display = 'none'; resultsContainer.innerHTML = ''; }
+           else { showResultsBtn.disabled = false; loadingIndicator.style.display = 'none'; }
+       }
+      function setReviewLoadingState(isLoading, message = "") {
+          generateReviewBtn.disabled = isLoading;
           if (isLoading) {
-              generateBtn.disabled = true;
-              resultsArea.style.display = 'block';
-              loadingIndicator.style.display = 'block';
-              errorMessage.style.display = 'none';
-              resultsContainer.innerHTML = ''; // Clear results when starting load
-          } else {
-              generateBtn.disabled = false;
-              loadingIndicator.style.display = 'none';
-          }
+              reviewStatus.textContent = message || "Processing..."; reviewStatus.className = 'info'; reviewStatus.style.display = 'block';
+              reviewOutput.style.display = 'none';
+          } else { if (!reviewStatus.classList.contains('error')) { reviewStatus.style.display = 'none'; } }
+       }
+      function displaySearchError(message) {
+           resultsContainer.innerHTML = ''; errorMessage.textContent = message; errorMessage.style.display = 'block'; resultsArea.style.display = 'block';
       }
-
-      function displayError(message) {
-           resultsContainer.innerHTML = ''; // Clear results on error
-           errorMessage.textContent = message;
-           errorMessage.style.display = 'block';
-           resultsArea.style.display = 'block'; // Ensure area is visible
+      function displayReviewStatus(message, isError = false) {
+           reviewStatus.textContent = message; reviewStatus.className = isError ? 'error' : 'info'; reviewStatus.style.display = 'block';
+           reviewOutput.style.display = 'none';
       }
-
-       function escapeHtml(unsafe) {
+      function displayReviewOutput(reviewText) {
+           reviewOutput.innerHTML = '';
+           const title = document.createElement('h3'); title.textContent = 'Generated Review:'; reviewOutput.appendChild(title);
+           const content = document.createElement('p'); content.textContent = reviewText || "No review content received."; reviewOutput.appendChild(content);
+           reviewOutput.style.display = 'block'; reviewStatus.style.display = 'none';
+       }
+      function escapeHtml(unsafe) {
           if (unsafe === null || unsafe === undefined) return '';
-          return String(unsafe)
-               .replace(/&/g, "&amp;")
-               .replace(/</g, "&lt;")
-               .replace(/>/g, "&gt;")
-               .replace(/"/g, "&quot;")
-               .replace(/'/g, "&#039;");
+          return String(unsafe).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
        }
 
     </script>
   </body>
-</html> 
+</html>
