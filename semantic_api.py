@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 SEMANTIC_SCHOLAR_API_URL = "https://api.semanticscholar.org/graph/v1"
 # SEMANTIC_SCHOLAR_API_KEY = os.getenv("SEMANTIC_SCHOLAR_API_KEY")
 
-MAX_RETRIES = 4
+MAX_RETRIES = 5
 INITIAL_BACKOFF_SECONDS = 1
 BACKOFF_FACTOR = 2
 

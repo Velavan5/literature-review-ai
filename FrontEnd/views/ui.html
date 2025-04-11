@@ -5,491 +5,1188 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Research Paper Search & Review</title>
     <style>
+      /* --- Styles (Use the comprehensive styles from the previous version) --- */
       :root {
-        --font-family-base: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-        --primary-color: #3a78c2; /* Main interactive blue */
-        --primary-darker: #2b61a1;
-        --secondary-color: #6c757d; /* Muted text / meta */
-        --background-body: #f4f7f9; /* Slightly softer background */
+        /* ... keep all your CSS variables ... */
+        --font-family-base: system-ui, -apple-system, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+        --primary-color: #4c51bf;
+        --primary-darker: #3641a3;
+        --primary-lighter: #e0e7ff;
+        --background-body: #f7fafc;
         --background-container: #ffffff;
-        --background-alt: #f8f9fa; /* Alt background for items */
-        --border-color-light: #e3eaf3; /* Lighter borders */
-        --border-color-medium: #ced4da; /* Standard borders */
-        --text-color-base: #343a40; /* Darker base text */
-        --text-color-muted: #6c757d;
-        --success-color: #28a745;
-        --success-darker: #218838;
-        --info-color: #17a2b8;    /* Color for Generate Review Button */
-        --info-darker: #117a8b;
-        --danger-color: #dc3545;
-        --danger-background: #f8d7da;
-        --info-text-color: #004085; /* Color for loading/status text */
-        --info-background: #cce5ff;
-
-        --border-radius-sm: 0.25rem; /* 4px */
-        --border-radius-md: 0.5rem;  /* 8px */
-        --border-radius-lg: 0.8rem;  /* 12.8px ~ 13px */
-        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --border-color-light: #e2e8f0;
+        --text-color-base: #2d3748;
+        --text-color-muted: #718096;
+        --heading-color: #1a202c;
+        --border-radius-md: 0.375rem;
+        --border-radius-lg: 0.5rem;
+        --box-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --transition-duration: 0.2s;
+        --transition-easing: ease-in-out;
+        --danger-color: #c53030;
+        --danger-background: #fed7d7;
+        --info-text-color: #2b6cb0;
+        --info-background: #ebf8ff;
+        --success-color: #2f855a;
+        --success-background: #f0fff4;
+        --success-border: #9ae6b4;
+        --review-btn-color: #dd6b20;
+        --review-btn-darker: #c05621;
       }
-
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      html { scroll-behavior: smooth; }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+        font-size: 16px;
+      }
       body {
-        padding: 20px; font-family: var(--font-family-base); background-color: var(--background-body);
-        display: flex; justify-content: center; color: var(--text-color-base);
-        line-height: 1.6; font-size: 15px;
+        padding: 20px;
+        font-family: var(--font-family-base);
+        background-color: var(--background-body);
+        display: flex;
+        justify-content: center;
+        color: var(--text-color-base);
+        line-height: 1.6;
       }
       .app-container {
-        display: flex; flex-wrap: wrap; max-width: 1200px;
-        width: 100%; gap: 25px; align-items: flex-start;
+        display: flex;
+        flex-wrap: wrap;
+        max-width: 1200px;
+        width: 100%;
+        gap: 30px;
+        align-items: flex-start;
       }
 
-      /* Sidebar Styles */
+      /* --- Sidebar Styles (Keep as before) --- */
       .sidebar {
-        flex: 0 0 280px; background-color: var(--background-container); border-radius: var(--border-radius-lg);
-        padding: 25px; box-shadow: var(--shadow-md); display: flex; flex-direction: column; max-height: 85vh;
+        flex: 1 0 300px;
+        max-width: 320px;
+        background-color: var(--background-container);
+        border-radius: var(--border-radius-lg);
+        padding: 25px;
+        box-shadow: var(--box-shadow-md);
+        border: 1px solid var(--border-color-light);
+        position: sticky;
+        top: 20px;
+        height: calc(100vh - 40px);
+        display: flex;
+        flex-direction: column;
       }
       .sidebar-header {
-        font-size: 1.1rem; font-weight: 600; color: var(--primary-color); margin-bottom: 15px;
-        padding-bottom: 10px; border-bottom: 1px solid var(--border-color-light);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--heading-color);
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color-light);
       }
-      .file-list { flex-grow: 1; overflow-y: auto; padding-right: 5px; }
-      .file-list::-webkit-scrollbar { width: 6px; } .file-list::-webkit-scrollbar-track { background: transparent; } .file-list::-webkit-scrollbar-thumb { background-color: var(--border-color-medium); border-radius: 10px; }
+      .sidebar-header svg {
+        width: 20px;
+        height: 20px;
+        color: var(--primary-color);
+      }
+      .file-list {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-right: 5px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 1rem;
+      }
+      .file-list::-webkit-scrollbar {
+        width: 6px;
+      }
+      .file-list::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .file-list::-webkit-scrollbar-thumb {
+        background-color: var(--border-color-light);
+        border-radius: 10px;
+      }
       .file-item {
-        background-color: #eef5ff; border-radius: var(--border-radius-md); padding: 10px 15px; margin-bottom: 10px;
-        display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;
-        transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #f8fafc;
+        padding: 10px 12px;
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--border-color-light);
+        transition: background-color var(--transition-duration),
+          transform var(--transition-duration);
+        cursor: default;
+        overflow: hidden;
       }
-      .file-item:hover { background-color: #dbe9ff; box-shadow: var(--shadow-sm); }
-      .file-name { max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
-      .remove-file { font-size: 1.1rem; cursor: pointer; color: var(--danger-color); margin-left: 10px; transition: transform 0.2s ease, color 0.2s ease; padding: 3px; line-height: 1; }
-      .remove-file:hover { transform: scale(1.2); color: #a71d2a; }
-      .no-files { color: var(--text-color-muted); font-style: italic; text-align: center; padding: 20px 10px; font-size: 0.9rem; }
+      .file-item:hover {
+        background-color: var(--primary-lighter);
+      }
+      .file-name {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-right: 8px;
+        font-size: 0.9rem;
+        color: var(--text-color-base);
+      }
+      .remove-file {
+        color: var(--danger-color);
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform var(--transition-duration), color 0.1s;
+        padding: 4px;
+        border-radius: 50%;
+        background: none;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .remove-file svg {
+        width: 16px;
+        height: 16px;
+      }
+      .remove-file:hover {
+        transform: scale(1.1);
+        background-color: #fee2e2;
+        color: #9b2c2c;
+      }
+      .no-files {
+        color: var(--text-color-muted);
+        font-size: 0.9rem;
+        padding: 1rem;
+        text-align: center;
+        border: 1px dashed var(--border-color-light);
+        border-radius: var(--border-radius-md);
+        background-color: #f8fafc;
+        margin-top: 1rem;
+      }
 
-      /* Main Content Styles */
+      /* --- Main Content Styles --- */
       .main {
-        flex: 1 1 600px; min-width: 300px; background-color: var(--background-container);
-        border-radius: var(--border-radius-lg); padding: 35px; box-shadow: var(--shadow-md);
-        display: flex; flex-direction: column; gap: 30px;
+        flex: 2 0 60%;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        width: 100%;
+      } /* Increased gap between main sections */
+
+      /* --- NEW: Combined Controls Container --- */
+      .controls-container {
+        background-color: var(--background-container);
+        border-radius: var(--border-radius-lg);
+        padding: 30px; /* Consistent padding */
+        box-shadow: var(--box-shadow-md);
+        border: 1px solid var(--border-color-light);
+        display: flex;
+        flex-direction: column;
+        gap: 25px; /* Spacing between control groups */
       }
-      label { font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 10px; color: #495057; }
+
+      /* Styles for elements *within* controls-container */
+      .controls-container > div, /* Target direct div children like search-options */
+      .controls-container > label[for="query-textarea"], /* Target query label */
+      .controls-container > textarea, /* Target query textarea */
+      .controls-container > label[for="optional-file"], /* Target file upload label */
+      .controls-container > .upload-helper-text, /* Target file upload helper */
+      .controls-container > .action-buttons, /* Target action buttons div */
+      .controls-container > .generate-review-helper /* Target review helper */ {
+        /* Elements inside inherit container background, no separate styling needed */
+      }
+
+      .controls-container > label {
+        /* Style labels within the container */
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px; /* Reduced bottom margin */
+        color: var(--heading-color);
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+      .controls-container > label svg {
+        width: 20px;
+        height: 20px;
+        color: var(--primary-color);
+      }
+
+      /* Query Textarea */
       textarea {
-        width: 100%; min-height: 140px; padding: 15px; font-size: 0.95rem; line-height: 1.6;
-        border-radius: var(--border-radius-md); border: 1px solid var(--border-color-medium);
-        background-color: var(--background-alt); transition: border-color 0.3s ease, box-shadow 0.3s ease; resize: vertical;
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--border-color-light);
+        border-radius: var(--border-radius-md);
+        font-family: var(--font-family-base);
+        resize: vertical;
+        font-size: 1rem;
+        color: var(--text-color-base);
+        transition: border-color var(--transition-duration),
+          box-shadow var(--transition-duration);
+        min-height: 100px;
       }
       textarea:focus {
-        border-color: var(--primary-color); outline: none; background-color: var(--background-container);
-        box-shadow: 0 0 0 3px rgba(58, 120, 194, 0.15);
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.15);
       }
 
-      /* Search Options Styling */
+      /* Search Options Div - Remove its own background/border if nested */
       .search-options {
-          display: flex; flex-wrap: wrap; gap: 20px 30px; align-items: center; padding: 15px;
-          background-color: var(--background-alt); border-radius: var(--border-radius-md); border: 1px solid var(--border-color-light);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 25px;
+        align-items: flex-end;
+        /* Removed background, border, padding from here - inherited from parent */
+        margin-top: 10px; /* Add some top margin */
       }
-      .option-group { display: flex; align-items: center; gap: 10px; }
-      .option-group label { margin-bottom: 0; font-weight: 500; font-size: 0.9rem; color: var(--text-color-base); }
+      .option-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1 1 180px;
+      }
+      .option-group label {
+        margin-bottom: 0;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--text-color-muted);
+      }
+      .option-group label[for^="limit-input"] svg {
+        display: none;
+      }
       input[type="number"] {
-          padding: 6px 10px; font-size: 0.9rem; border-radius: var(--border-radius-sm);
-          border: 1px solid var(--border-color-medium); width: 70px; text-align: center;
-          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        padding: 10px;
+        border: 1px solid var(--border-color-light);
+        border-radius: var(--border-radius-md);
+        font-family: var(--font-family-base);
+        font-size: 1rem;
+        color: var(--text-color-base);
+        transition: border-color var(--transition-duration),
+          box-shadow var(--transition-duration);
+        width: 100%;
+        max-width: 100px;
       }
-      input[type="number"]:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 2px rgba(58, 120, 194, 0.15); }
-      .checkbox-label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; font-size: 0.9rem; color: var(--text-color-base); }
-      input[type="checkbox"] { cursor: pointer; width: 1em; height: 1em; accent-color: var(--primary-color); margin-top: -1px; }
+      input[type="number"]:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.15);
+      }
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        color: var(--text-color-base);
+        padding: 10px 0;
+      }
+      .checkbox-label svg {
+        width: 18px;
+        height: 18px;
+        color: var(--primary-color);
+      }
+      input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        border: 1px solid var(--border-color-light);
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 8px;
+        accent-color: var(--primary-color);
+      }
+      input[type="checkbox"]:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.15);
+      }
 
-      /* File Upload */
-      .file-upload-container {
-        border: 2px dashed var(--border-color-light); padding: 25px; text-align: center;
-        border-radius: var(--border-radius-lg); transition: background-color 0.2s ease, border-color 0.2s ease;
-        background-color: #fcfdff;
-      }
-      .file-upload-container:hover { background-color: #f5faff; border-color: #a8c7e9; }
-      input[type="file"] { display: none; }
+      /* File Upload Label/Input/Helper */
       .file-upload-label {
-        display: inline-block; padding: 10px 22px; background-color: var(--primary-color); color: white;
-        font-weight: 500; border-radius: var(--border-radius-md); cursor: pointer;
-        transition: background-color 0.2s ease, transform 0.1s ease; font-size: 0.9rem;
+        padding: 10px 20px;
+        background-color: var(--primary-color);
+        color: var(--background-container);
+        border-radius: var(--border-radius-md);
+        cursor: pointer;
+        transition: background-color var(--transition-duration),
+          transform var(--transition-duration);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        border: none;
+        font-size: 1rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        align-self: flex-start; /* Align button left */
       }
-      .file-upload-label:hover { background-color: var(--primary-darker); transform: translateY(-1px); }
+      .file-upload-label svg {
+        width: 18px;
+        height: 18px;
+      }
+      .file-upload-label:hover {
+        background-color: var(--primary-darker);
+        transform: translateY(-1px);
+        box-shadow: var(--box-shadow-md);
+      }
+      input[type="file"] {
+        display: none;
+      }
+      .upload-helper-text {
+        font-size: 0.85rem;
+        color: var(--text-color-muted);
+        margin-top: 5px;
+      }
 
-      /* Action Buttons Container */
-      .action-buttons { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
-      /* Shared Button Styles */
+      /* Action Buttons & Helper Text */
+      .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 10px;
+      }
       .action-btn {
-         padding: 12px 30px; border: none; border-radius: var(--border-radius-md); font-size: 1rem;
-         font-weight: 600; cursor: pointer; align-self: flex-start;
-         transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
-         letter-spacing: 0.5px; color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: var(--border-radius-md);
+        font-family: var(--font-family-base);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color var(--transition-duration),
+          transform var(--transition-duration), box-shadow 0.3s ease;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
       }
-      .action-btn:disabled { background-color: #ccc; color: #888; cursor: not-allowed; transform: none; box-shadow: none; }
-      /* Specific Button Styles */
-      .show-results-btn { background-color: var(--success-color); }
-      .show-results-btn:hover:not(:disabled) { background-color: var(--success-darker); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2); }
-      .generate-review-btn { background-color: var(--info-color); }
-      .generate-review-btn:hover:not(:disabled) { background-color: var(--info-darker); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(23, 162, 184, 0.2); }
+      .action-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .action-btn:disabled {
+        background-color: #a0aec0;
+        color: #e2e8f0;
+        cursor: not-allowed;
+        opacity: 0.7;
+        transform: none;
+        box-shadow: none;
+      }
+      .show-results-btn {
+        background-color: var(--primary-color);
+        color: var(--background-container);
+      }
+      .show-results-btn:hover:not(:disabled) {
+        background-color: var(--primary-darker);
+        transform: translateY(-1px);
+        box-shadow: var(--box-shadow-md);
+      }
+      .generate-review-btn {
+        background-color: var(--review-btn-color);
+        color: var(--background-container);
+      }
+      .generate-review-btn:hover:not(:disabled) {
+        background-color: var(--review-btn-darker);
+        transform: translateY(-1px);
+        box-shadow: var(--box-shadow-md);
+      }
+      .generate-review-helper {
+        font-size: 0.85rem;
+        color: var(--text-color-muted);
+        margin-top: 1rem;
+        padding: 10px;
+        background-color: #f8fafc;
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--border-color-light);
+        text-align: left;
+      }
+      #review-status {
+        margin-top: 1rem;
+        padding: 12px 20px;
+        border-radius: var(--border-radius-md);
+        text-align: center;
+        font-size: 0.95rem;
+        font-weight: 500;
+        border: 1px solid;
+      }
+      #review-status.error {
+        color: var(--danger-color);
+        background-color: var(--danger-background);
+        border-color: #fbd38d;
+      }
+      #review-status.info {
+        color: var(--info-text-color);
+        background-color: var(--info-background);
+        border-color: #bee3f8;
+      }
+      #review-status.success {
+        color: var(--success-color);
+        background-color: var(--success-background);
+        border-color: var(--success-border);
+      }
 
-       /* Helper text for generate review button */
-       .generate-review-helper {
-           font-size: 0.85rem;
-           color: var(--text-color-muted);
-           margin-top: -20px; /* Adjust spacing relative to buttons */
-           margin-bottom: 10px; /* Add some space below */
-       }
-
-      /* Results Area Styles */
-      #results-area { margin-top: 25px; border-top: 1px solid var(--border-color-light); padding-top: 25px; }
-      #results-area h2 { font-size: 1.2rem; font-weight: 600; color: var(--primary-color); margin-bottom: 20px; }
-      #results-container { display: flex; flex-direction: column; gap: 25px; }
-      .paper-item { background-color: var(--background-container); border: 1px solid var(--border-color-light); border-radius: var(--border-radius-md); padding: 20px 25px; transition: box-shadow 0.25s ease, border-color 0.25s ease; }
-      .paper-item:hover { box-shadow: var(--shadow-md); border-color: var(--border-color-medium); }
-      .paper-title { font-size: 1.1rem; font-weight: 600; color: #212529; margin-bottom: 8px; line-height: 1.4; }
-      .paper-meta { font-size: 0.85rem; color: var(--text-color-muted); margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; } /* Added align-items */
-      .paper-meta span { display: inline-flex; align-items: center; gap: 4px; } /* Use flex for icon alignment */
-      .paper-meta strong { font-weight: 500; color: #495057; }
-      .paper-authors { font-style: normal; }
-      .paper-abstract { font-size: 0.95rem; line-height: 1.7; color: #495057; margin-bottom: 15px; max-height: 7.5em; overflow: hidden; cursor: pointer; position: relative; transition: max-height 0.3s ease-out; }
-      .paper-abstract::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2.5em; background: linear-gradient(transparent, var(--background-container) 85%); pointer-events: none; transition: opacity 0.3s ease-out; opacity: 1; }
-      .paper-abstract.expanded { max-height: 1000px; cursor: default; }
-      .paper-abstract.expanded::after { opacity: 0; }
-      .paper-actions a { display: inline-flex; align-items: center; gap: 5px; background-color: var(--primary-color); color: white; padding: 7px 15px; border-radius: var(--border-radius-md); font-size: 0.85rem; font-weight: 500; text-decoration: none; transition: background-color 0.2s ease, transform 0.1s ease; margin-top: 5px; }
-      .paper-actions a:hover { background-color: var(--primary-darker); transform: translateY(-1px); }
-      .paper-actions .no-pdf { font-size: 0.85rem; color: var(--text-color-muted); font-style: italic; margin-top: 5px; display: inline-block; }
-
-      /* Loading/Error/Status Indicators */
-      #loading-indicator, #error-message, #review-status { margin-top: 20px; padding: 12px 20px; border-radius: var(--border-radius-md); text-align: center; font-size: 0.95rem; font-weight: 500; }
-      #loading-indicator { color: var(--info-text-color); background-color: var(--info-background); border: 1px solid #bee5eb; }
-      #error-message, #review-status.error { color: var(--danger-color); background-color: var(--danger-background); border: 1px solid #f5c6cb; }
-      #review-status.info { color: var(--info-text-color); background-color: var(--info-background); border: 1px solid #bee5eb; }
-
-      /* Review Output Area */
-      #review-output { margin-top: 15px; background-color: #eef5ff; /* Light blue background */ border: 1px solid #a8c7e9; border-radius: var(--border-radius-md); padding: 20px; white-space: pre-wrap; font-family: var(--font-family-base); /* Use base font */ font-size: 0.95rem; line-height: 1.7; display: none; max-height: 500px; overflow-y: auto; }
-      #review-output h3 { margin-bottom: 15px; font-size: 1.1rem; color: var(--primary-darker); }
-
+      /* --- Results Area Styles (Keep as separate section) --- */
+      #results-area {
+        background-color: var(--background-container);
+        border-radius: var(--border-radius-lg);
+        padding: 30px;
+        box-shadow: var(--box-shadow-md);
+        border: 1px solid var(--border-color-light);
+        display: none; /* Hidden initially */
+        margin-top: 0; /* Removed top margin as it's now controlled by main gap */
+      }
+      #results-area h2 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.3rem;
+        color: var(--heading-color);
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color-light);
+        padding-bottom: 1rem;
+      }
+      #results-area h2 svg {
+        width: 22px;
+        height: 22px;
+        color: var(--primary-color);
+      }
+      #loading-indicator {
+        display: none;
+        text-align: center;
+        padding: 1.5rem;
+        font-size: 1rem;
+        color: var(--info-text-color);
+        background-color: var(--info-background);
+        border-radius: var(--border-radius-md);
+        border: 1px solid #bee3f8;
+      }
+      #error-message {
+        display: none;
+        color: var(--danger-color);
+        padding: 1rem 1.5rem;
+        background-color: var(--danger-background);
+        border-radius: var(--border-radius-md);
+        border: 1px solid #fed7d7;
+        font-size: 0.95rem;
+        text-align: center;
+        font-weight: 500;
+      }
+      #results-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .paper-item {
+        padding: 20px 25px;
+        background-color: #fdfdff; /* Slightly different bg for item */
+        border-radius: var(--border-radius-md); /* Smaller radius */
+        border: 1px solid var(--border-color-light);
+        box-shadow: none; /* Remove individual shadow */
+        transition: transform var(--transition-duration),
+          background-color var(--transition-duration);
+      }
+      .paper-item:hover {
+        background-color: #f8fafc;
+        transform: none;
+      }
+      .paper-title {
+        font-size: 1.1rem;
+        color: var(--heading-color);
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+        line-height: 1.4;
+      }
+      .paper-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 20px;
+        font-size: 0.8rem;
+        color: var(--text-color-muted);
+        margin-bottom: 1rem;
+      }
+      .paper-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding-right: 15px;
+        border-right: 1px solid var(--border-color-light);
+        white-space: nowrap;
+      }
+      .paper-meta span:last-child {
+        border-right: none;
+        padding-right: 0;
+      }
+      .paper-meta span svg {
+        width: 14px;
+        height: 14px;
+        margin-right: 3px;
+        opacity: 0.7;
+      }
+      .paper-meta strong {
+        font-weight: 500;
+        color: var(--text-color-base);
+      }
+      .paper-abstract {
+        font-size: 0.9rem;
+        color: var(--text-color-base);
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        overflow: hidden;
+        transition: max-height 0.4s ease-in-out;
+        max-height: 7em;
+        position: relative;
+        cursor: pointer;
+      }
+      .paper-abstract.expanded {
+        max-height: 1000px;
+        cursor: default;
+      }
+      .paper-abstract:not(.expanded)::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2.5em;
+        background: linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0),
+          #fdfdff 80%
+        );
+        pointer-events: none;
+      }
+      .paper-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 1rem;
+      }
+      .paper-actions a {
+        padding: 8px 15px;
+        background-color: var(--primary-color);
+        color: var(--background-container);
+        border-radius: var(--border-radius-md);
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color var(--transition-duration),
+          transform var(--transition-duration);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+      }
+      .paper-actions a svg {
+        width: 14px;
+        height: 14px;
+      }
+      .paper-actions a:hover {
+        background-color: var(--primary-darker);
+        transform: translateY(-1px);
+      }
+      .paper-actions a:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.15);
+      }
+      .no-pdf {
+        color: var(--text-color-muted);
+        font-style: italic;
+        padding: 8px 12px;
+        border-radius: var(--border-radius-md);
+        background-color: #f8fafc;
+        border: 1px solid var(--border-color-light);
+        font-size: 0.85rem;
+      }
 
       /* Responsive */
+      @media (max-width: 992px) {
+        .sidebar {
+          position: static;
+          height: auto;
+          max-height: none;
+          flex: 1 1 100%;
+          order: -1;
+        }
+        .main {
+          flex: 1 1 100%;
+        }
+      }
       @media (max-width: 768px) {
-        body { padding: 15px; }
-        .app-container { flex-direction: column; gap: 15px; }
-        .sidebar, .main { width: 100%; flex-basis: auto; padding: 20px; }
-        .sidebar { max-height: 40vh; }
-        .paper-meta { font-size: 0.8rem; }
-        .paper-title { font-size: 1rem; }
-        .search-options { flex-direction: column; align-items: flex-start; }
-        .action-buttons { justify-content: center; }
+        body {
+          padding: 15px;
+        }
+        .app-container {
+          gap: 20px;
+        }
+        .controls-container,
+        #results-area {
+          padding: 20px;
+        }
+        .main {
+          gap: 20px;
+        }
+        .search-options {
+          gap: 15px;
+        }
+        .action-buttons {
+          justify-content: center;
+        }
       }
     </style>
   </head>
   <body>
     <div class="app-container">
       <aside class="sidebar">
-        <div class="sidebar-header">📁 Uploaded PDF Files</div>
+        <div class="sidebar-header">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" />
+            <polyline points="14 2 14 8 20 8" />
+            <path d="M12 17.5v-5.5" />
+            <path d="m10 14 2-2 2 2" />
+            <path d="M8 22v-3a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3" />
+          </svg>
+          Uploaded PDFs
+        </div>
         <div class="file-list" id="file-list">
           <div class="no-files">No PDF files uploaded yet</div>
         </div>
       </aside>
 
       <main class="main">
-        <section>
-          <label for="query-textarea">📝 Enter Query or Keywords (for Search)</label>
-          <textarea name="query" id="query-textarea" placeholder="Enter keywords, a paper title..." rows="5"></textarea>
-        </section>
+        <section class="controls-container">
+          <div>
+            <label for="query-textarea">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              Search Academic Papers
+            </label>
+            <textarea
+              name="query"
+              id="query-textarea"
+              placeholder="Enter keywords, paper title, DOI..."
+              rows="4"
+            ></textarea>
+          </div>
 
-        <section class="search-options">
-             <div class="option-group"> <label for="limit-input">Max Results:</label> <input type="number" id="limit-input" name="limit" value="15" min="1" max="100"> </div>
-             <div class="option-group"> <label class="checkbox-label" for="require-pdf-checkbox"> <input type="checkbox" id="require-pdf-checkbox" name="requirePdf"> Only show papers with PDF links </label> </div>
-        </section>
+          <div class="search-options">
+            <div class="option-group">
+              <label for="limit-input">Max Results</label>
+              <input
+                type="number"
+                id="limit-input"
+                name="limit"
+                value="10"
+                min="1"
+                max="50"
+              />
+            </div>
+            <div class="option-group">
+              <label class="checkbox-label" for="require-pdf-checkbox">
+                <input
+                  type="checkbox"
+                  id="require-pdf-checkbox"
+                  name="requirePdf"
+                />
+                Require PDF Link?
+              </label>
+            </div>
+          </div>
 
-        <section class="file-upload-container">
-            <label class="file-upload-label" for="optional-file"> 📤 Choose PDF Files </label>
+          <div class="file-upload-group">
+            <label class="file-upload-label" for="optional-file">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" />
+                <polyline points="14 2 14 8 20 8" />
+                <path d="M12 17.5v-5.5" />
+                <path d="m10 14 2-2 2 2" />
+              </svg>
+              Upload PDF for Review
+            </label>
             <input type="file" id="optional-file" multiple accept=".pdf" />
-            <p style="font-size: 12px; color: #667; margin-top: 10px;"> (Select local PDFs to upload for review generation) </p>
+            <p class="upload-helper-text">
+              Select local PDF files to upload for review generation.
+            </p>
+          </div>
+
+          <div class="action-buttons-group">
+            <div class="action-buttons">
+              <button class="action-btn show-results-btn" id="show-results-btn">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+                Search Papers
+              </button>
+              <button
+                class="action-btn generate-review-btn"
+                id="generate-review-btn"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M12 22h6a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v10" />
+                  <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+                  <path d="M3 15h6" />
+                  <path d="M6 18h3" />
+                </svg>
+                Generate Review
+              </button>
+            </div>
+            <p class="generate-review-helper">
+              "Generate Review" uses the first uploaded PDF, or the first search
+              result with a PDF link if no files are uploaded.
+            </p>
+            <div id="review-status" style="display: none"></div>
+          </div>
         </section>
-
-        <div class="action-buttons">
-            <button class="action-btn show-results-btn" id="show-results-btn">🚀 Show Search Results</button>
-            <button class="action-btn generate-review-btn" id="generate-review-btn">📄 Generate Review</button>
-        </div>
-        <p class="generate-review-helper"> Generates review for the first uploaded PDF, or uses the first search result with a PDF link if no files are uploaded. </p>
-
-
-        <div id="review-status" style="display: none;"></div>
-        <div id="review-output" style="display: none;"></div>
-
-
-        <section id="results-area" style="display: none;">
-            <h2>Search Results</h2>
-            <div id="loading-indicator" style="display: none;">⏳ Loading results... Please wait.</div>
-            <div id="error-message" style="display: none;"></div>
-            <div id="results-container">
-                </div>
+        <section id="results-area">
+          <h2>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 6h16" />
+              <path d="M4 12h16" />
+              <path d="M4 18h16" />
+            </svg>
+            Search Results
+          </h2>
+          <div id="loading-indicator">
+             <span class="sr-only">Loading...</span>
+          </div>
+          <div id="error-message"></div>
+          <div id="results-container"></div>
         </section>
       </main>
     </div>
 
     <script>
-      // --- Element References ---
-      const fileList = document.getElementById("file-list");
+      // --- Element References (Keep all previous references) ---
+      const fileList = document.getElementById("file-list"); // etc... keep all refs
       const optionalFileInput = document.getElementById("optional-file");
-      const showResultsBtn = document.getElementById('show-results-btn');
-      const queryTextarea = document.getElementById('query-textarea');
-      const resultsArea = document.getElementById('results-area');
-      const resultsContainer = document.getElementById('results-container');
-      const loadingIndicator = document.getElementById('loading-indicator');
-      const errorMessage = document.getElementById('error-message');
-      const limitInput = document.getElementById('limit-input');
-      const requirePdfCheckbox = document.getElementById('require-pdf-checkbox');
-      const generateReviewBtn = document.getElementById('generate-review-btn');
-      const reviewStatus = document.getElementById('review-status');
-      const reviewOutput = document.getElementById('review-output');
+      const showResultsBtn = document.getElementById("show-results-btn");
+      const queryTextarea = document.getElementById("query-textarea");
+      const resultsArea = document.getElementById("results-area");
+      const resultsContainer = document.getElementById("results-container");
+      const loadingIndicator = document.getElementById("loading-indicator");
+      const errorMessage = document.getElementById("error-message");
+      const limitInput = document.getElementById("limit-input");
+      const requirePdfCheckbox = document.getElementById(
+        "require-pdf-checkbox"
+      );
+      const generateReviewBtn = document.getElementById("generate-review-btn");
+      const reviewStatus = document.getElementById("review-status");
 
       // --- State Variables ---
-      const uploadedFiles = new Map(); // Stores File objects: { name: File }
-      let currentSearchResults = []; // Store search results
+      const uploadedFiles = new Map();
+      let currentSearchResults = [];
 
       // --- Event Listeners ---
       optionalFileInput.addEventListener("change", handleFileUploadChange);
-      showResultsBtn.addEventListener('click', handleSearch);
-      generateReviewBtn.addEventListener('click', handleGenerateReview);
+      showResultsBtn.addEventListener("click", handleSearch);
+      generateReviewBtn.addEventListener("click", handleGenerateReview);
 
       // --- File Upload Logic ---
       function handleFileUploadChange() {
-           const files = optionalFileInput.files;
-           if (files.length > 0) {
-               const noFilesMsg = fileList.querySelector(".no-files");
-               if (noFilesMsg) noFilesMsg.remove();
-               for (const file of files) {
-                   if (file.type !== 'application/pdf') {
-                       alert(`File "${file.name}" is not a PDF and was ignored.`);
-                       continue;
-                   }
-                   if (!uploadedFiles.has(file.name)) {
-                       addFileToSidebar(file);
-                       uploadedFiles.set(file.name, file);
-                   } else { console.warn(`File "${file.name}" already added.`); }
-               }
-           }
-           optionalFileInput.value = ""; // Reset file input
-           checkShowNoFilesMessage();
+        /* ... (same as before) ... */
+        const files = optionalFileInput.files;
+        if (files.length > 0) {
+          const noFilesMsg = fileList.querySelector(".no-files");
+          if (noFilesMsg) noFilesMsg.remove();
+          for (const file of files) {
+            if (file.type !== "application/pdf") {
+              alert(`File "${file.name}" is not a PDF and was ignored.`);
+              continue;
+            }
+            if (!uploadedFiles.has(file.name)) {
+              addFileToSidebar(file);
+              uploadedFiles.set(file.name, file);
+            } else {
+              console.warn(`File "${file.name}" already added.`);
+            }
+          }
+        }
+        optionalFileInput.value = "";
+        checkShowNoFilesMessage();
       }
       function addFileToSidebar(file) {
-           const item = document.createElement("div"); item.className = "file-item"; item.dataset.filename = file.name;
-           const nameSpan = document.createElement("span"); nameSpan.className = "file-name"; nameSpan.textContent = file.name; nameSpan.title = file.name;
-           const removeBtn = document.createElement("span"); removeBtn.className = "remove-file"; removeBtn.innerHTML = "&#x1F5D1;&#xFE0F;"; removeBtn.title = "Remove file"; removeBtn.setAttribute('role', 'button'); removeBtn.setAttribute('aria-label', `Remove ${file.name}`);
-           removeBtn.addEventListener("click", (e) => {
-               e.stopPropagation();
-               item.remove();
-               uploadedFiles.delete(file.name);
-               checkShowNoFilesMessage();
-           });
-           item.appendChild(nameSpan); item.appendChild(removeBtn); fileList.appendChild(item);
+        /* ... (same as before, including remove button logic) ... */
+        const item = document.createElement("div");
+        item.className = "file-item";
+        item.dataset.filename = file.name;
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "file-name";
+        nameSpan.textContent = file.name;
+        nameSpan.title = file.name;
+        const removeBtn = document.createElement("button");
+        removeBtn.className = "remove-file";
+        removeBtn.type = "button";
+        removeBtn.title = "Remove file";
+        removeBtn.setAttribute("aria-label", `Remove ${file.name}`);
+        removeBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+        removeBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          item.remove();
+          uploadedFiles.delete(file.name);
+          checkShowNoFilesMessage();
+        });
+        item.appendChild(nameSpan);
+        item.appendChild(removeBtn);
+        fileList.appendChild(item);
       }
-       function checkShowNoFilesMessage() {
-           if (uploadedFiles.size === 0) {
-               if (!fileList.querySelector(".no-files")) {
-                    const noFilesMsg = document.createElement("div"); noFilesMsg.className = "no-files"; noFilesMsg.textContent = "No PDF files uploaded yet"; fileList.appendChild(noFilesMsg);
-               }
-           } else {
-                const noFilesMsg = fileList.querySelector(".no-files");
-                if (noFilesMsg) noFilesMsg.remove();
-           }
-       }
+      function checkShowNoFilesMessage() {
+        /* ... (same as before) ... */
+        if (uploadedFiles.size === 0) {
+          if (!fileList.querySelector(".no-files")) {
+            const noFilesMsg = document.createElement("div");
+            noFilesMsg.className = "no-files";
+            noFilesMsg.textContent = "No PDF files uploaded yet";
+            fileList.appendChild(noFilesMsg);
+          }
+        } else {
+          const noFilesMsg = fileList.querySelector(".no-files");
+          if (noFilesMsg) noFilesMsg.remove();
+        }
+      }
 
       // --- Search Query Logic ---
       async function handleSearch() {
-           const query = queryTextarea.value.trim();
-           const limitValue = parseInt(limitInput.value, 10) || 15;
-           const requirePdfValue = requirePdfCheckbox.checked;
-           if (!query) { displaySearchError("Please enter a query..."); return; }
-           if (limitValue <= 0 || limitValue > 100) { displaySearchError("Limit must be 1-100."); return; }
-           setSearchLoadingState(true);
-           currentSearchResults = []; // Clear previous results
-           try {
-               // Fetch from Node.js server's /search endpoint
-               const response = await fetch('/search', {
-                   method: 'POST',
-                   headers: { 'Content-Type': 'application/json' },
-                   body: JSON.stringify({ query: query, limit: limitValue, requirePdf: requirePdfValue })
-               });
-               if (!response.ok) {
-                   let errorData; try { errorData = await response.json(); } catch { errorData = { error: `Server error: ${response.status}` }; }
-                   throw new Error(errorData.error || `Server error: ${response.status}`);
-               }
-               const papers = await response.json();
-               currentSearchResults = papers; // Store results
-               displaySearchResults(papers); // Display results
-           } catch (error) {
-               console.error('Search Error:', error);
-               displaySearchError(`Failed to fetch results: ${error.message}`);
-               currentSearchResults = []; // Clear on error
-           } finally {
-               setSearchLoadingState(false);
-           }
-       }
-
+        /* ... (same as before) ... */
+        const query = queryTextarea.value.trim();
+        const limitValue = parseInt(limitInput.value, 10) || 10;
+        const requirePdfValue = requirePdfCheckbox.checked;
+        if (!query) {
+          displaySearchError("Please enter a search query.");
+          queryTextarea.focus();
+          return;
+        }
+        if (limitValue <= 0 || limitValue > 50) {
+          displaySearchError("Max results must be between 1 and 50.");
+          limitInput.focus();
+          return;
+        }
+        setSearchLoadingState(true);
+        currentSearchResults = [];
+        try {
+          const response = await fetch("/search", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              query: query,
+              limit: limitValue,
+              requirePdf: requirePdfValue,
+            }),
+          });
+          if (!response.ok) {
+            let errorData;
+            try {
+              errorData = await response.json();
+            } catch {
+              errorData = { error: `Search service error: ${response.status}` };
+            }
+            throw new Error(
+              errorData.error || `Search service error: ${response.status}`
+            );
+          }
+          const papers = await response.json();
+          currentSearchResults = papers;
+          displaySearchResults(papers);
+        } catch (error) {
+          console.error("Search Error:", error);
+          displaySearchError(
+            `Failed to fetch search results: ${error.message}`
+          );
+          currentSearchResults = [];
+        } finally {
+          setSearchLoadingState(false);
+        }
+      }
       // --- Display Search Results Function ---
       function displaySearchResults(papers) {
-          resultsContainer.innerHTML = ''; // Clear previous results
-          errorMessage.style.display = 'none'; // Hide error message
-
-          if (!Array.isArray(papers) || papers.length === 0) {
-              resultsContainer.innerHTML = '<p style="text-align: center; color: #777;">No relevant papers found matching your search criteria.</p>';
-              return;
-          }
-
-          papers.forEach(paper => {
-              const paperDiv = document.createElement('div');
-              paperDiv.className = 'paper-item';
-
-              const title = escapeHtml(paper.title || 'No Title Provided');
-              const year = escapeHtml(paper.year || 'N/A');
-              const authors = Array.isArray(paper.authors) ? escapeHtml(paper.authors.join(', ')) : 'No Authors Listed';
-              const abstractText = escapeHtml(paper.abstract || 'No Abstract Available');
-              const citations = paper.citationCount; // Assumes backend sends this
-              const citationsText = (citations === null || citations === undefined) ? 'N/A' : citations;
-              const pdfUrl = paper.pdfUrl;
-
-              const abstractDiv = document.createElement('div');
-              abstractDiv.className = 'paper-abstract';
-              abstractDiv.innerText = abstractText;
-              if (abstractText.length > 300) {
-                   abstractDiv.title = 'Click to expand/collapse abstract';
-                   abstractDiv.addEventListener('click', () => abstractDiv.classList.toggle('expanded'));
-              } else {
-                   abstractDiv.classList.add('expanded');
-                   abstractDiv.style.cursor = 'default';
-              }
-
-              // Build inner HTML for title and metadata line
-              paperDiv.innerHTML = `
-                  <div class="paper-title">${title}</div>
-                  <div class="paper-meta">
-                      <span class="paper-year">🗓️ <strong>Year:</strong> ${year}</span>
-                      <span class="paper-authors">👥 <strong>Authors:</strong> ${authors}</span>
-                      <span class="paper-citations">📊 <strong>Citations:</strong> ${citationsText}</span>
-                  </div>
-              `;
-
-              // Append abstract and actions after setting innerHTML
-              paperDiv.appendChild(abstractDiv);
-              const actionsDiv = document.createElement('div');
-              actionsDiv.className = 'paper-actions';
-              actionsDiv.innerHTML = `
-                  ${pdfUrl ?
-                      `<a href="${pdfUrl}" target="_blank" rel="noopener noreferrer" title="Opens PDF in a new tab">⬇️ Open PDF</a>` :
-                      '<span class="no-pdf">No direct PDF link found</span>'
-                  }
-              `;
-              paperDiv.appendChild(actionsDiv);
-
-              resultsContainer.appendChild(paperDiv);
+        /* ... (same as before, including citation count display) ... */
+        resultsContainer.innerHTML = "";
+        errorMessage.style.display = "none";
+        if (!Array.isArray(papers) || papers.length === 0) {
+          errorMessage.textContent =
+            "No relevant papers found matching your search criteria.";
+          errorMessage.style.display = "block";
+          return;
+        }
+        papers.forEach((paper) => {
+          const paperDiv = document.createElement("div");
+          paperDiv.className = "paper-item";
+          const title = escapeHtml(paper.title || "No Title Provided");
+          const year = escapeHtml(paper.year || "N/A");
+          const authors = Array.isArray(paper.authors)
+            ? escapeHtml(paper.authors.join(", "))
+            : "No Authors Listed";
+          const abstractText = escapeHtml(
+            paper.abstract || "No Abstract Available"
+          );
+          const citations = paper.citationCount;
+          const citationsText =
+            citations === null || citations === undefined ? "N/A" : citations;
+          const pdfUrl = paper.pdfUrl;
+          const abstractDiv = document.createElement("div");
+          abstractDiv.className = "paper-abstract";
+          abstractDiv.innerText = abstractText;
+          abstractDiv.addEventListener("click", () => {
+            if (abstractText.length > 300) {
+              abstractDiv.classList.toggle("expanded");
+            }
           });
+          if (abstractText.length <= 300) {
+            abstractDiv.classList.add("expanded");
+            abstractDiv.style.cursor = "default";
+          }
+          paperDiv.innerHTML = `<div class="paper-title">${title}</div><div class="paper-meta"><span title="Year Published"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg><strong>Year:</strong> ${year}</span><span title="Authors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><strong>Authors:</strong> ${authors}</span><span title="Citation Count"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14h.01"/><path d="M7 7h10a2 2 0 0 1 2 2v7.5a3.5 3.5 0 0 1-7 0V9a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h4"/><path d="M7 17h.01"/></svg><strong>Citations:</strong> ${citationsText}</span></div>`;
+          paperDiv.appendChild(abstractDiv);
+          const actionsDiv = document.createElement("div");
+          actionsDiv.className = "paper-actions";
+          actionsDiv.innerHTML = `${
+            pdfUrl
+              ? `<a href="${pdfUrl}" target="_blank" rel="noopener noreferrer" title="Open PDF in new tab"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6h6"/><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M10 13v-1h4v1"/><path d="M10 16h4"/><path d="M12 16v-3"/></svg>Open PDF</a>`
+              : '<span class="no-pdf">No direct PDF link found</span>'
+          }`;
+          paperDiv.appendChild(actionsDiv);
+          resultsContainer.appendChild(paperDiv);
+        });
       }
-
 
       // --- Review Generation Logic ---
       async function handleGenerateReview() {
-           let sourceFound = false;
-           // Priority 1: Local File
-           if (uploadedFiles.size > 0) {
-               const firstFileEntry = uploadedFiles.values().next();
-               if (firstFileEntry.value) {
-                   sourceFound = true;
-                   console.log("Review source: First uploaded file.");
-                   await generateReviewFromFile(firstFileEntry.value);
-               }
-           }
-           // Priority 2: Search Result URL
-           if (!sourceFound) {
-               if (currentSearchResults.length > 0) {
-                    const paperWithPdf = currentSearchResults.find(paper => paper && paper.pdfUrl);
-                    if (paperWithPdf) {
-                        sourceFound = true;
-                        console.log("Review source: First search result with PDF URL.");
-                        await generateReviewFromUrl(paperWithPdf.pdfUrl);
-                    }
-               }
-           }
-           // No Source Found
-           if (!sourceFound) {
-               console.log("Review source: None found.");
-               displayReviewStatus("Please upload a PDF file or perform a search returning PDF links first.", true);
-           }
+        /* ... (same priority logic as before) ... */
+        let sourceFound = false;
+        if (uploadedFiles.size > 0) {
+          const firstFileEntry = uploadedFiles.values().next();
+          if (firstFileEntry.value) {
+            sourceFound = true;
+            console.log("Review source: First uploaded file.");
+            await generateReviewFromFile(firstFileEntry.value);
+            return;
+          }
+        }
+        if (currentSearchResults.length > 0) {
+          const paperWithPdf = currentSearchResults.find(
+            (paper) => paper && paper.pdfUrl
+          );
+          if (paperWithPdf) {
+            sourceFound = true;
+            console.log("Review source: First search result with PDF URL.");
+            await generateReviewFromUrl(paperWithPdf.pdfUrl);
+            return;
+          }
+        }
+        if (!sourceFound) {
+          console.log("Review source: None found.");
+          displayReviewStatus(
+            "Please upload a PDF file or perform a search that returns results with PDF links first.",
+            true
+          );
+        }
       }
-
       async function generateReviewFromFile(fileToProcess) {
-           console.log(`Processing file: ${fileToProcess.name}`);
-           setReviewLoadingState(true, `Processing ${fileToProcess.name}...`);
-           const formData = new FormData();
-           formData.append('pdfFile', fileToProcess); // Key must match multer in server.js
-           try {
-               // Fetch to Node.js endpoint for file review
-               const response = await fetch('/generate-review', { method: 'POST', body: formData });
-               const result = await response.json();
-               if (!response.ok) throw new Error(result.error || `Server error: ${response.status}`);
-               displayReviewOutput(result.review);
-           } catch (error) {
-               console.error('Review Generation Error (File):', error);
-               displayReviewStatus(`Error generating review from file: ${error.message}`, true);
-           } finally {
-               setReviewLoadingState(false);
-           }
+        /* ... (same logic: fetch /generate-review, use sessionStorage, window.open) ... */
+        console.log(`Processing file: ${fileToProcess.name}`);
+        setReviewLoadingState(true, `Processing ${fileToProcess.name}...`);
+        const formData = new FormData();
+        formData.append("pdfFile", fileToProcess);
+        try {
+          const response = await fetch("/generate-review", {
+            method: "POST",
+            body: formData,
+          });
+          const result = await response.json();
+          if (!response.ok)
+            throw new Error(result.error || `Server error: ${response.status}`);
+          sessionStorage.setItem(
+            "reviewData",
+            result.review || "No review content generated."
+          );
+          window.open("review", "_blank");
+          displayReviewStatus(
+            "Review generated! Opening in new tab...",
+            false,
+            true
+          );
+        } catch (error) {
+          console.error("Review Generation Error (File):", error);
+          displayReviewStatus(
+            `Error generating review from file: ${error.message}`,
+            true
+          );
+        } finally {
+          setReviewLoadingState(false);
+        }
       }
-
       async function generateReviewFromUrl(pdfUrl) {
-           console.log(`Processing URL: ${pdfUrl}`);
-           setReviewLoadingState(true, `Processing PDF from search result...`);
-           try {
-                // Fetch to Node.js endpoint for URL review
-               const response = await fetch('/generate-review-url', {
-                   method: 'POST',
-                   headers: { 'Content-Type': 'application/json' },
-                   body: JSON.stringify({ pdfUrl: pdfUrl })
-               });
-               const result = await response.json();
-               if (!response.ok) throw new Error(result.error || `Server error: ${response.status}`);
-               displayReviewOutput(result.review);
-           } catch (error) {
-               console.error('Review Generation Error (URL):', error);
-               displayReviewStatus(`Error generating review from URL: ${error.message}`, true);
-           } finally {
-               setReviewLoadingState(false);
-           }
+        /* ... (same logic: fetch /generate-review-url, use sessionStorage, window.open) ... */
+        console.log(`Processing URL: ${pdfUrl}`);
+        setReviewLoadingState(true, `Processing PDF from search result...`);
+        try {
+          const response = await fetch("/generate-review-url", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ pdfUrl: pdfUrl }),
+          });
+          const result = await response.json();
+          if (!response.ok)
+            throw new Error(result.error || `Server error: ${response.status}`);
+          sessionStorage.setItem(
+            "reviewData",
+            result.review || "No review content generated."
+          );
+          window.open("review", "_blank");
+          displayReviewStatus(
+            "Review generated! Opening in new tab...",
+            false,
+            true
+          );
+        } catch (error) {
+          console.error("Review Generation Error (URL):", error);
+          displayReviewStatus(
+            `Error generating review from URL: ${error.message}`,
+            true
+          );
+        } finally {
+          setReviewLoadingState(false);
+        }
       }
-
 
       // --- UI State Functions ---
       function setSearchLoadingState(isLoading) {
-           if (isLoading) { showResultsBtn.disabled = true; resultsArea.style.display = 'block'; loadingIndicator.style.display = 'block'; errorMessage.style.display = 'none'; resultsContainer.innerHTML = ''; }
-           else { showResultsBtn.disabled = false; loadingIndicator.style.display = 'none'; }
-       }
+        /* ... (same as before) ... */
+        showResultsBtn.disabled = isLoading;
+        resultsArea.style.display = isLoading
+          ? "block"
+          : currentSearchResults.length > 0
+          ? "block"
+          : "none";
+        loadingIndicator.style.display = isLoading ? "flex" : "none";
+        errorMessage.style.display = "none";
+        if (isLoading) resultsContainer.innerHTML = "";
+      }
       function setReviewLoadingState(isLoading, message = "") {
-          generateReviewBtn.disabled = isLoading;
-          if (isLoading) {
-              reviewStatus.textContent = message || "Processing..."; reviewStatus.className = 'info'; reviewStatus.style.display = 'block';
-              reviewOutput.style.display = 'none';
-          } else { if (!reviewStatus.classList.contains('error')) { reviewStatus.style.display = 'none'; } }
-       }
+        /* ... (same as before, including success message timeout) ... */
+        generateReviewBtn.disabled = isLoading;
+        if (isLoading) {
+          reviewStatus.textContent = message || "Processing...";
+          reviewStatus.className = "info";
+          reviewStatus.style.display = "block";
+        } else {
+          if (
+            !reviewStatus.classList.contains("error") &&
+            !reviewStatus.classList.contains("success")
+          ) {
+            reviewStatus.style.display = "none";
+          }
+        }
+      }
       function displaySearchError(message) {
-           resultsContainer.innerHTML = ''; errorMessage.textContent = message; errorMessage.style.display = 'block'; resultsArea.style.display = 'block';
+        /* ... (same as before) ... */
+        resultsContainer.innerHTML = "";
+        errorMessage.textContent = message;
+        errorMessage.style.display = "block";
+        resultsArea.style.display = "block";
+        loadingIndicator.style.display = "none";
       }
-      function displayReviewStatus(message, isError = false) {
-           reviewStatus.textContent = message; reviewStatus.className = isError ? 'error' : 'info'; reviewStatus.style.display = 'block';
-           reviewOutput.style.display = 'none';
+      function displayReviewStatus(
+        message,
+        isError = false,
+        isSuccess = false
+      ) {
+        /* ... (same as before, including success timeout) ... */
+        reviewStatus.textContent = message;
+        if (isError) {
+          reviewStatus.className = "error";
+        } else if (isSuccess) {
+          reviewStatus.className = "success";
+        } else {
+          reviewStatus.className = "info";
+        }
+        reviewStatus.style.display = "block";
+        if (isSuccess) {
+          setTimeout(() => {
+            if (reviewStatus.classList.contains("success")) {
+              reviewStatus.style.display = "none";
+            }
+          }, 4000);
+        }
       }
-      function displayReviewOutput(reviewText) {
-           reviewOutput.innerHTML = '';
-           const title = document.createElement('h3'); title.textContent = 'Generated Review:'; reviewOutput.appendChild(title);
-           const content = document.createElement('p'); content.textContent = reviewText || "No review content received."; reviewOutput.appendChild(content);
-           reviewOutput.style.display = 'block'; reviewStatus.style.display = 'none';
-       }
       function escapeHtml(unsafe) {
-          if (unsafe === null || unsafe === undefined) return '';
-          return String(unsafe).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-       }
-
+        /* ... (same as before) ... */
+        if (unsafe === null || unsafe === undefined) return "";
+        return String(unsafe)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
     </script>
   </body>
 </html>
