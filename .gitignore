@@ -15,5 +15,5 @@ venv/
 Thumbs.db
 
 node_modules
-package*
+package-lock.json
 downloaded_papers
